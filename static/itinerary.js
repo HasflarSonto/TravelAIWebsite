@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     displayItinerary(data.events);
                 } else {
                     console.error("No itinerary found:", data.error);
+                    document.getElementById("itinerary-list").innerHTML = "<p>No itinerary found. Please create a trip first.</p>";
                 }
             })
             .catch(error => console.error("Error fetching itinerary:", error));
@@ -23,15 +24,33 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        let currentDate = "";
         events.forEach(event => {
+            // Insert a date header when the date changes
+            if (event.date !== currentDate) {
+                currentDate = event.date;
+                const dateHeader = document.createElement("h2");
+                dateHeader.className = "itinerary-date";
+                dateHeader.innerText = new Date(currentDate).toLocaleDateString("en-US", {
+                    weekday: "long", year: "numeric", month: "long", day: "numeric"
+                });
+                itineraryList.appendChild(dateHeader);
+            }
+
+            // Create an event card
             const eventDiv = document.createElement("div");
             eventDiv.className = "itinerary-event";
+
             eventDiv.innerHTML = `
-                <h3>${event.title}</h3>
-                <p><strong>Date:</strong> ${event.date} | <strong>Location:</strong> ${event.location}</p>
-                <p><strong>Cost:</strong> $${event.cost}</p>
-                <button class="confirm-btn" data-id="${event.id}">Confirm</button>
-                <button class="modify-btn" data-id="${event.id}">Modify</button>
+                <div class="event-container">
+                    <h3 class="event-title">${event.title || "Untitled Event"}</h3>
+                    <p class="event-time">${event.start_time} → ${event.end_time}</p>
+                    <p class="event-location">${event.location}</p>
+                    <div class="event-buttons">
+                        <button class="confirm-btn" data-id="${event.id}">Confirm</button>
+                        <button class="modify-btn" data-id="${event.id}">Modify</button>
+                    </div>
+                </div>
             `;
 
             itineraryList.appendChild(eventDiv);

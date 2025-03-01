@@ -33,7 +33,6 @@ def extract_json_from_claude(response_text):
         print(f"❌ Raw Response: {response_text}")  # Debugging output
         return None  # Return None if JSON parsing fails
 
-
 def generate_trip_plan(natural_input, parameters, use_test_data=False):
     """Calls Claude AI to generate a structured trip plan or returns test JSON."""
     
@@ -46,20 +45,22 @@ def generate_trip_plan(natural_input, parameters, use_test_data=False):
                     "date": "2025-03-14",
                     "location": "Rome",
                     "activities": [
-                        {"title": "Arrive in Rome, check into hotel", "cost": 0},
-                        {"title": "Explore Trastevere", "cost": 20}
+                        {
+                            "title": "Arrive in Rome, check into hotel",
+                            "start_time": "9:00 AM",
+                            "end_time": "10:00 AM",
+                            "location": "Hotel Roma Central",
+                            "cost": 0
+                        },
+                        {
+                            "title": "Explore Trastevere",
+                            "start_time": "11:00 AM",
+                            "end_time": "1:00 PM",
+                            "location": "Trastevere District",
+                            "cost": 20
+                        }
                     ],
                     "daily_budget": 50
-                },
-                {
-                    "day": 2,
-                    "date": "2025-03-15",
-                    "location": "Rome",
-                    "activities": [
-                        {"title": "Visit the Colosseum", "cost": 40},
-                        {"title": "Lunch at local trattoria", "cost": 30}
-                    ],
-                    "daily_budget": 100
                 }
             ]
         }
@@ -68,10 +69,11 @@ def generate_trip_plan(natural_input, parameters, use_test_data=False):
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
     prompt = f"""
-    You are an AI assistant that generates structured travel itineraries in JSON format.
+    You are an AI assistant that generates structured travel itineraries in JSON format. (keep it short)
 
     **TASK**:
-    Generate a JSON itinerary based on the user's request. The response **must** follow this format:
+    Generate a JSON itinerary with **specific start and end times** and a **unique location for each activity**.
+    The response **must** follow this format:
 
     ```json
     {{
@@ -88,6 +90,9 @@ def generate_trip_plan(natural_input, parameters, use_test_data=False):
           "activities": [
             {{
               "title": "<activity_name>",
+              "start_time": "<hh:mm AM/PM>",
+              "end_time": "<hh:mm AM/PM>",
+              "location": "<specific_activity_location>",
               "cost": <cost_in_dollars>
             }}
           ],
@@ -98,7 +103,7 @@ def generate_trip_plan(natural_input, parameters, use_test_data=False):
     ```
 
     **RULES**:
-    - **Use the exact structure above**. The root key for the list **must** be `"days"` (not `"itinerary"`).
+    - **Each activity must have `start_time`, `end_time`, and a `location`.**
     - **Ensure the response is complete and valid JSON.**
     - **Do not include explanatory text or comments in the output. Only return raw JSON.**
 
@@ -110,13 +115,11 @@ def generate_trip_plan(natural_input, parameters, use_test_data=False):
             model="claude-3-opus-20240229",
             max_tokens=2000,
             temperature=0.7,
-            system="Generate a JSON itinerary following a strict format.",
+            system="Generate a JSON itinerary with specific start and end times.",
             messages=[{"role": "user", "content": prompt}]
         )
-        print("Claude API Raw Response:", response.content[0].text)  # ✅ Debugging
 
         json_data = extract_json_from_claude(response.content[0].text)
-
 
         if not json_data:
             print("❌ Error: JSON is None")
@@ -136,6 +139,7 @@ def generate_trip_plan(natural_input, parameters, use_test_data=False):
     except Exception as e:
         print(f"❌ Error calling Claude API: {e}")
         return []
+
 
 
 @app.route('/')
@@ -198,14 +202,18 @@ def get_trip_events():
         if isinstance(day, dict) and "activities" in day:
             for activity in day["activities"]:
                 formatted_events.append({
-                    "id": str(uuid.uuid4()),  # Assign a unique ID
-                    "date": day.get("date", f"Day {day.get('day', '?')}"),  # Ensure a valid date
-                    "location": day.get("location", "Unknown"),  # Ensure a valid location
-                    "title": activity["title"] if isinstance(activity, dict) else activity,  # Ensure title exists
-                    "cost": activity.get("cost", 0) if isinstance(activity, dict) else 0  # Ensure cost exists
+                    "id": str(uuid.uuid4()),
+                    "date": day.get("date", f"Day {day.get('day', '?')}"),
+                    "location": activity.get("location", day.get("location", "Unknown")),  # ✅ Ensures each activity has a location
+                    "title": activity["title"] if isinstance(activity, dict) else activity,
+                    "start_time": activity.get("start_time", "TBD"),
+                    "end_time": activity.get("end_time", "TBD"),
+                    "cost": activity.get("cost", 0) if isinstance(activity, dict) else 0
                 })
 
     return jsonify({"success": True, "events": formatted_events})
+
+
 
 
 

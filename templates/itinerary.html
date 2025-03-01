@@ -3,16 +3,32 @@
 {% block title %}Itinerary - Trip Planner{% endblock %}
 
 {% block content %}
+    <div class="itinerary-header">
+        <h1>YOUR TRIP ITINERARY</h1>
+        <h2 id="trip-date-range"></h2>
+    </div>
+
     <div class="itinerary-container">
-        <h1>Your Trip Itinerary</h1>
-        <p>Review and confirm your planned events. You can modify or replace any event.</p>
-        
         <div id="itinerary-list">
             <!-- Events will be dynamically inserted here -->
         </div>
-
-        <p><strong>Need to make changes?</strong> Click on an event to modify or request an alternative.</p>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("/api/trip/events")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.events.length > 0) {
+                        const startDate = data.events[0].date;
+                        const endDate = data.events[data.events.length - 1].date;
+                        document.getElementById("trip-date-range").innerText = 
+                            new Date(startDate).toLocaleDateString() + " - " +
+                            new Date(endDate).toLocaleDateString();
+                    }
+                });
+        });
+    </script>
 
     <script src="{{ url_for('static', filename='itinerary.js') }}"></script>
 {% endblock %}
