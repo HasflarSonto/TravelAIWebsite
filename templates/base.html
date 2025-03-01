@@ -8,11 +8,15 @@
 </head>
 <body>
 
-    <nav>
-        <ul>
-            <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('plan') }}">Plan a Trip</a></li>
-            <li><a href="{{ url_for('itinerary') }}">View Itinerary</a></li>
+    <nav style="background-color: transparent;">
+        <ul style="display: flex; justify-content: center; align-items: center; padding: 0 5%;">
+            <li style="margin: 0 20px; text-align: center;"><a href="{{ url_for('plan') }}" style="color: #5b6a95; transition: color 0.3s ease;" onmouseover="this.style.color='#161c1c'" onmouseout="this.style.color='#5b6a95'">Plan a Trip</a></li>
+            <li style="margin: 0 20px; text-align: center;">
+                <a href="{{ url_for('home') }}">
+                    <img src="{{ url_for('static', filename='images/logo.gif') }}" alt="Trip Planner Logo" style="height: 50px; max-width: 100%;">
+                </a>
+            </li>
+            <li style="margin: 0 20px; text-align: center;"><a href="{{ url_for('itinerary') }}" style="color: #5b6a95; transition: color 0.3s ease;" onmouseover="this.style.color='#161c1c'" onmouseout="this.style.color='#5b6a95'">View Itinerary</a></li>
         </ul>
     </nav>
 
@@ -24,5 +28,14 @@
         <p>&copy; 2025 Trip Planner AI | Built with Flask & Claude AI</p>
     </footer>
 
+    <style>
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
 </body>
 </html>
