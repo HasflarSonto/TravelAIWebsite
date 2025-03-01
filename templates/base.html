@@ -10,13 +10,17 @@
 
     <nav style="background-color: transparent;">
         <ul style="display: flex; justify-content: center; align-items: center; padding: 0 5%;">
-            <li style="margin: 0 20px; text-align: center;"><a href="{{ url_for('plan') }}" style="color: #5b6a95; transition: color 0.3s ease;" onmouseover="this.style.color='#161c1c'" onmouseout="this.style.color='#5b6a95'">Plan a Trip</a></li>
+            <li style="margin: 0 20px; text-align: center;">
+                <a href="{{ url_for('plan') }}" style="color: #5b6a95; transition: color 0.3s ease; {% if request.path == url_for('plan') %}font-weight: bold;{% endif %}" onmouseover="this.style.color='#161c1c'" onmouseout="this.style.color='#5b6a95'">Plan a Trip</a>
+            </li>
             <li style="margin: 0 20px; text-align: center;">
                 <a href="{{ url_for('home') }}">
                     <img src="{{ url_for('static', filename='images/logo.gif') }}" alt="Trip Planner Logo" style="height: 50px; max-width: 100%;">
                 </a>
             </li>
-            <li style="margin: 0 20px; text-align: center;"><a href="{{ url_for('itinerary') }}" style="color: #5b6a95; transition: color 0.3s ease;" onmouseover="this.style.color='#161c1c'" onmouseout="this.style.color='#5b6a95'">View Itinerary</a></li>
+            <li style="margin: 0 20px; text-align: center;">
+                <a href="{{ url_for('itinerary') }}" style="color: #5b6a95; transition: color 0.3s ease; {% if request.path == url_for('itinerary') %}font-weight: bold;{% endif %}" onmouseover="this.style.color='#161c1c'" onmouseout="this.style.color='#5b6a95'">View Itinerary</a>
+            </li>
         </ul>
     </nav>
 
