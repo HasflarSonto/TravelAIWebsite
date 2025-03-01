@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Plan Your Trip - Trip Planner{% endblock %}
+
+{% block content %}
+    <div class="plan-container">
+        <h1>Plan Your Trip</h1>
+        <p>Enter your trip details, and our AI will generate a personalized itinerary for you.</p>
+
+        <form id="trip-form">
+            <label for="naturalLanguageInput">Describe your trip:</label>
+            <textarea id="naturalLanguageInput" name="naturalLanguageInput" placeholder="I want to visit Italy and explore historic sites..." required></textarea>
+
+            <label for="budget">Budget ($):</label>
+            <input type="number" id="budget" name="budget" required>
+
+            <label for="peopleCount">Number of Travelers:</label>
+            <input type="number" id="peopleCount" name="peopleCount" required>
+
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" name="startDate" required>
+
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" name="endDate" required>
+
+            <button type="submit" class="btn">Generate Itinerary</button>
+        </form>
+
+        <p id="loading-message" style="display: none;">Generating your itinerary... Please wait.</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='plan.js') }}"></script>
+{% endblock %}

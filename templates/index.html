@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Trip Planner{% endblock %}
+
+{% block content %}
+    <div class="home-container">
+        <h1>Welcome to AI Trip Planner</h1>
+        <p>Plan your next adventure with AI-generated itineraries tailored to your preferences.</p>
+        <a href="{{ url_for('plan') }}" class="btn">Start Planning</a>
+    </div>
+{% endblock %}

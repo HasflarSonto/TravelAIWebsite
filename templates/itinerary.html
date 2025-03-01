@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Itinerary - Trip Planner{% endblock %}
+
+{% block content %}
+    <div class="itinerary-container">
+        <h1>Your Trip Itinerary</h1>
+        <p>Review and confirm your planned events. You can modify or replace any event.</p>
+        
+        <div id="itinerary-list">
+            <!-- Events will be dynamically inserted here -->
+        </div>
+
+        <p><strong>Need to make changes?</strong> Click on an event to modify or request an alternative.</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='itinerary.js') }}"></script>
+{% endblock %}

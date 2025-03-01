@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Error - Trip Planner{% endblock %}
+
+{% block content %}
+    <div class="error-container">
+        <h1>Oops! Something went wrong.</h1>
+        <p>{{ error_message }}</p>
+        <a href="{{ url_for('home') }}" class="btn">Go Back Home</a>
+    </div>
+{% endblock %}
