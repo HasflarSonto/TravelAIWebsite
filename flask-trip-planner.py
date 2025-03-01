@@ -34,78 +34,99 @@ def extract_json_from_claude(response_text):
         return None  # Return None if JSON parsing fails
 
 def generate_trip_plan(natural_input, parameters, use_test_data=False):
-    """Calls Claude AI to generate a structured trip plan or returns test JSON."""
+    """Calls Claude AI to generate a structured trip plan including travel logistics.""" 
     
     if use_test_data:
-        print("⚡ Using test JSON instead of Claude API")
+        print("⚡ Using test JSON instead of Claude API") 
         test_json = {
             "days": [
                 {
                     "day": 1,
                     "date": "2025-03-14",
-                    "location": "Rome",
+                    "location": parameters["start_location"],
                     "activities": [
                         {
-                            "title": "Arrive in Rome, check into hotel",
-                            "start_time": "9:00 AM",
-                            "end_time": "10:00 AM",
-                            "location": "Hotel Roma Central",
-                            "cost": 0
+                            "title": f"Depart from {parameters['start_location']}",
+                            "start_time": "6:00 AM",
+                            "end_time": "9:00 AM",
+                            "location": f"{parameters['start_location']} International Airport",
+                            "cost": 300
                         },
                         {
-                            "title": "Explore Trastevere",
-                            "start_time": "11:00 AM",
-                            "end_time": "1:00 PM",
-                            "location": "Trastevere District",
-                            "cost": 20
+                            "title": f"Flight to {parameters['end_location']}",
+                            "start_time": "10:00 AM",
+                            "end_time": "2:00 PM",
+                            "location": f"{parameters['end_location']} International Airport",
+                            "cost": 700
                         }
                     ],
-                    "daily_budget": 50
+                    "daily_budget": 1000
                 }
             ]
         }
-        return test_json["days"]  # ✅ Always return a list
+        return test_json["days"]
 
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
     prompt = f"""
-    You are an AI assistant that generates structured travel itineraries in JSON format. (keep it short)
+    You are an AI assistant that generates structured travel itineraries in JSON format. (Keep the response short for now)
 
     **TASK**:
-    Generate a JSON itinerary with **specific start and end times** and a **unique location for each activity**.
-    The response **must** follow this format:
+    Generate a JSON itinerary with:
+    - **A clear travel plan from `{parameters['start_location']}` to `{parameters['end_location']}`**.
+    - **Transportation options** (flight, train, bus, car, etc.).
+    - **Departure & arrival times**.
+    - **Each activity must have a start time, end time, and location**.
+    - **Return in valid JSON format only.**
 
+    **Example JSON format:**
     ```json
     {{
-      "destination": "<destination>",
+      "destination": "{parameters['end_location']}",
       "budget": {parameters['budget']},
       "travelers": {parameters['people_count']},
       "start_date": "{parameters['start_date']}",
       "end_date": "{parameters['end_date']}",
       "days": [
         {{
-          "day": <day_number>,
+          "day": 1,
           "date": "<YYYY-MM-DD>",
-          "location": "<city_or_town>",
+          "location": "{parameters['start_location']}",
           "activities": [
             {{
-              "title": "<activity_name>",
-              "start_time": "<hh:mm AM/PM>",
-              "end_time": "<hh:mm AM/PM>",
-              "location": "<specific_activity_location>",
-              "cost": <cost_in_dollars>
+              "title": "Flight from {parameters['start_location']} to {parameters['end_location']}",
+              "start_time": "10:00 AM",
+              "end_time": "2:00 PM",
+              "location": "{parameters['start_location']} International Airport",
+              "cost": 700
             }}
           ],
-          "daily_budget": <total_cost_for_the_day>
+          "daily_budget": 1000
+        }},
+        {{
+          "day": 2,
+          "date": "<YYYY-MM-DD>",
+          "location": "{parameters['end_location']}",
+          "activities": [
+            {{
+              "title": "Explore City Center",
+              "start_time": "10:00 AM",
+              "end_time": "12:00 PM",
+              "location": "{parameters['end_location']} Downtown",
+              "cost": 50
+            }}
+          ],
+          "daily_budget": 200
         }}
       ]
     }}
     ```
 
     **RULES**:
-    - **Each activity must have `start_time`, `end_time`, and a `location`.**
-    - **Ensure the response is complete and valid JSON.**
-    - **Do not include explanatory text or comments in the output. Only return raw JSON.**
+    - **Include transportation from `{parameters['start_location']}` to `{parameters['end_location']}`.**
+    - **Ensure realistic travel times based on location.**
+    - **Include activities at `{parameters['end_location']}` after arrival.**
+    - **Ensure JSON is structured correctly.**
 
     **User Request**: {natural_input}
     """
@@ -113,9 +134,9 @@ def generate_trip_plan(natural_input, parameters, use_test_data=False):
     try:
         response = client.messages.create(
             model="claude-3-opus-20240229",
-            max_tokens=2000,
+            max_tokens=3000,
             temperature=0.7,
-            system="Generate a JSON itinerary with specific start and end times.",
+            system="Generate a JSON itinerary with travel logistics.",
             messages=[{"role": "user", "content": prompt}]
         )
 
@@ -125,11 +146,9 @@ def generate_trip_plan(natural_input, parameters, use_test_data=False):
             print("❌ Error: JSON is None")
             return []
 
-        # ✅ Handle list responses
         if isinstance(json_data, list):
             return json_data
 
-        # ✅ Handle dictionary responses
         if isinstance(json_data, dict) and "days" in json_data and isinstance(json_data["days"], list):
             return json_data["days"]
 
@@ -159,10 +178,10 @@ def itinerary():
 
 @app.route('/api/trip', methods=['POST'])
 def create_trip():
-    """API endpoint to create a new trip."""
+    """API endpoint to create a new trip considering start & end locations."""
     try:
         data = request.json
-        required_fields = ["naturalLanguageInput", "budget", "peopleCount", "startDate", "endDate"]
+        required_fields = ["naturalLanguageInput", "budget", "peopleCount", "startDate", "endDate", "startLocation", "endLocation"]
         for field in required_fields:
             if field not in data or not data[field]:
                 return jsonify({"success": False, "error": f"Missing field: {field}"}), 400
@@ -172,18 +191,25 @@ def create_trip():
             'budget': int(data['budget']),
             'people_count': int(data['peopleCount']),
             'start_date': data['startDate'],
-            'end_date': data['endDate']
+            'end_date': data['endDate'],
+            'start_location': data['startLocation'],
+            'end_location': data['endLocation']
         }
 
+        # ✅ Generate itinerary considering start & end locations
         trip_plan = generate_trip_plan(natural_input, parameters)
 
-        session['trip_events'] = trip_plan  # ✅ Store list directly
+        # ✅ Store in session
+        session['trip_events'] = trip_plan
+        session['trip_parameters'] = parameters
+        session['trip_natural_input'] = natural_input
         session.modified = True
 
         return jsonify({'success': True, 'events': trip_plan})
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
 
 
 @app.route('/api/trip/events', methods=['GET'])

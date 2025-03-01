@@ -1,23 +1,36 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const tripForm = document.getElementById("trip-form");
-    const loadingMessage = document.getElementById("loading-message");
-
-    tripForm.addEventListener("submit", function (event) {
+    document.getElementById("trip-form").addEventListener("submit", function (event) {
         event.preventDefault(); // Prevent default form submission
 
-        // Gather form data
-        const tripData = {
-            naturalLanguageInput: document.getElementById("naturalLanguageInput").value,
-            budget: document.getElementById("budget").value,
-            peopleCount: document.getElementById("peopleCount").value,
-            startDate: document.getElementById("startDate").value,
-            endDate: document.getElementById("endDate").value
-        };
+        const generateButton = document.querySelector(".btn");
+        const loadingMessage = document.getElementById("loading-message");
 
-        // Show loading message
+        // Show the loading message and disable the button
+        generateButton.disabled = true;
+        generateButton.innerText = "Generating...";
         loadingMessage.style.display = "block";
 
-        // Send data to backend
+        const tripData = {
+            startLocation: document.getElementById("startLocation").value.trim(),
+            endLocation: document.getElementById("endLocation").value.trim(),
+            naturalLanguageInput: document.getElementById("naturalLanguageInput").value.trim(),
+            budget: document.getElementById("budget").value.trim(),
+            peopleCount: document.getElementById("peopleCount").value.trim(),
+            startDate: document.getElementById("startDate").value.trim(),
+            endDate: document.getElementById("endDate").value.trim()
+        };
+
+        // Ensure all fields are included
+        for (let field in tripData) {
+            if (!tripData[field]) {
+                alert(`Missing field: ${field}`);
+                generateButton.disabled = false;
+                generateButton.innerText = "Generate Itinerary";
+                loadingMessage.style.display = "none";
+                return;
+            }
+        }
+
         fetch("/api/trip", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -25,18 +38,21 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.json())
         .then(data => {
-            loadingMessage.style.display = "none"; // Hide loading message
-
             if (data.success) {
-                window.location.href = "/itinerary"; // Redirect to itinerary page
+                window.location.href = "/itinerary";
             } else {
                 alert("Error: " + data.error);
+                generateButton.disabled = false;
+                generateButton.innerText = "Generate Itinerary";
+                loadingMessage.style.display = "none";
             }
         })
         .catch(error => {
-            loadingMessage.style.display = "none"; // Hide loading message
-            console.error("Error creating trip:", error);
-            alert("An error occurred. Please try again.");
+            console.error("Error:", error);
+            alert("An error occurred while generating your itinerary.");
+            generateButton.disabled = false;
+            generateButton.innerText = "Generate Itinerary";
+            loadingMessage.style.display = "none";
         });
     });
 });

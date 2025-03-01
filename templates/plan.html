@@ -8,8 +8,28 @@
         <p style="background-color: #fbfff0; box-shadow: none;">Enter your trip details, and our AI will generate a personalized itinerary for you.</p>
 
         <form id="trip-form" style="background-color: #fbfff0; box-shadow: none;">
+            
+            <label for="startLocation" style="background-color: #fbfff0; box-shadow: none;">Starting Location:</label>
+            <input type="text" id="startLocation" name="startLocation" placeholder="e.g., Beijing, China" required 
+                   style="background-color: #161c1c; border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
+            <style>
+                #startLocation::placeholder {
+                    color: #8796cf;
+                }
+            </style>
+
+            <label for="endLocation" style="background-color: #fbfff0; box-shadow: none;">Destination:</label>
+            <input type="text" id="endLocation" name="endLocation" placeholder="e.g., Rome, Italy" required 
+                   style="background-color: #161c1c; border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
+            <style>
+                #endLocation::placeholder {
+                    color: #8796cf;
+                }
+            </style>
+
             <label for="naturalLanguageInput" style="background-color: #fbfff0; box-shadow: none;">Describe your trip:</label>
-            <textarea id="naturalLanguageInput" name="naturalLanguageInput" placeholder="I want to visit Italy and explore historic sites..." required style="background-color: #161c1c; border-radius: 20px; color: white; padding: 12px; box-shadow: none;"></textarea>
+            <textarea id="naturalLanguageInput" name="naturalLanguageInput" placeholder="I want to visit Italy and explore historic sites..." required 
+                      style="background-color: #161c1c; border-radius: 20px; color: white; padding: 12px; box-shadow: none;"></textarea>
             <style>
                 #naturalLanguageInput::placeholder {
                     color: #8796cf;
@@ -17,7 +37,8 @@
             </style>
 
             <label for="budget" style="background-color: #fbfff0; box-shadow: none;">Budget ($):</label>
-            <input type="number" id="budget" name="budget" required style="background-color: #161c1c; border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
+            <input type="number" id="budget" name="budget" required 
+                   style="background-color: #161c1c; border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
             <style>
                 #budget::placeholder {
                     color: #8796cf;
@@ -25,7 +46,8 @@
             </style>
 
             <label for="peopleCount" style="background-color: #fbfff0; box-shadow: none;">Number of Travelers:</label>
-            <input type="number" id="peopleCount" name="peopleCount" required style="background-color: #161c1c; border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
+            <input type="number" id="peopleCount" name="peopleCount" required 
+                   style="background-color: #161c1c; border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
             <style>
                 #peopleCount::placeholder {
                     color: #8796cf;
@@ -33,7 +55,8 @@
             </style>
 
             <label for="startDate" style="background-color: #fbfff0; box-shadow: none;">Start Date:</label>
-            <input type="date" id="startDate" name="startDate" required style="background-color: #161c1c; border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
+            <input type="date" id="startDate" name="startDate" required 
+                   style="background-color: #161c1c; border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
             <style>
                 #startDate::placeholder {
                     color: #8796cf;
@@ -41,7 +64,8 @@
             </style>
 
             <label for="endDate" style="background-color: #fbfff0; box-shadow: none;">End Date:</label>
-            <input type="date" id="endDate" name="endDate" required style="background-color: #161c1c; border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
+            <input type="date" id="endDate" name="endDate" required 
+                   style="background-color: #161c1c; border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
             <style>
                 #endDate::placeholder {
                     color: #8796cf;

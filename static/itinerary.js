@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <h3 class="event-title">${event.title || "Untitled Event"}</h3>
                     <p class="event-time">${event.start_time} → ${event.end_time}</p>
                     <p class="event-location">${event.location}</p>
+                    <p class="event-location">cost: ${event.cost}$</p>
                     <div class="event-buttons">
                         <button class="confirm-btn" data-id="${event.id}">Confirm</button>
                         <button class="modify-btn" data-id="${event.id}">Modify</button>
