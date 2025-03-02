@@ -3,85 +3,65 @@
 {% block title %}Plan Your Trip - Trip Planner{% endblock %}
 
 {% block content %}
-    <div class="plan-container" style="background-color: #161c1c; box-shadow: none;">
-        <h1 style="background-color: #161c1c; box-shadow: none; text-align: center; color: rgba(251, 255, 240, 0.8);">Plan Your Trip</h1>
-        <p style="background-color:rgba(22, 28, 28, 0.5); box-shadow: none; text-align: center;">Enter your trip details, and our AI will generate a personalized itinerary for you.</p>
-
-        <form id="trip-form" style="background-color: #161c1c; box-shadow: none; outline-color: rgba(22, 28, 28, 0.5);">
+<div class="header-container" style="display: flex; justify-content: flex-start; width: 100%; margin-bottom: 20px; opacity: 1; min-height: 100vh; align-items: flex-start; flex-direction: row; padding-top: 0; flex-wrap: wrap; position: absolute; top: 0; left: 0;">
+    <div style="width: 25%; padding: 20px; margin-left: 5%;" class="header-section">
+        <h1 style="text-align: left; color: rgba(251, 255, 240, 0.8); font-size: 3.5em; margin-bottom: 30px; box-shadow: none; opacity: 1; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease;">Plan Your Trip</h1>
+    </div>
+    
+    <div class="plan-container" style="background-color:transparent; box-shadow: none; opacity: 0; width: 40%; max-width: 800px; margin: 0 auto; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10;">
+        <form id="trip-form" style="background-color:transparent; box-shadow: none; outline-color: rgba(22, 28, 28, 0.5);">
             
-            <label for="startLocation" style="background-color: #161c1c; box-shadow: none; color:#ab936f">Starting Location:</label>
+            <label for="startLocation" style="background-color:transparent; box-shadow: none; color:#8796cf">Starting Location:</label>
             <input type="text" id="startLocation" name="startLocation" placeholder="e.g., Beijing, China" required 
-                   style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
-            <style>
-                #startLocation::placeholder {
-                    color: #8796cf;
-                }
-            </style>
-
-            <label for="endLocation" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Destination:</label>
+                   style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95">
+            
+            <label for="endLocation" style="background-color:transparent; box-shadow: none;color:#8796cf">Destination:</label>
             <input type="text" id="endLocation" name="endLocation" placeholder="e.g., Rome, Italy" required 
-                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
-            <style>
-                #endLocation::placeholder {
-                    color: #8796cf;
-                }
-            </style>
-
-            <label for="naturalLanguageInput" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Describe your trip:</label>
+                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95">
+            
+            <label for="naturalLanguageInput" style="background-color:transparent; box-shadow: none;color:#8796cf">Describe your trip:</label>
             <textarea id="naturalLanguageInput" name="naturalLanguageInput" placeholder="I want to visit Italy and explore historic sites..." required 
-                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf"></textarea>
-            <style>
-                #naturalLanguageInput::placeholder {
-                    color: #8796cf;
-                }
-            </style>
-
-            <label for="budget" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Budget ($):</label>
+                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95"></textarea>
+            
+            <label for="budget" style="background-color:transparent; box-shadow: none;color:#8796cf">Budget ($):</label>
             <input type="number" id="budget" name="budget" required 
-                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
-            <style>
-                #budget::placeholder {
-                    color: #8796cf;
-                }
-            </style>
-
-            <label for="peopleCount" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Number of Travelers:</label>
+                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95">
+            
+            <label for="peopleCount" style="background-color:transparent; box-shadow: none;color:#8796cf">Number of Travelers:</label>
             <input type="number" id="peopleCount" name="peopleCount" required 
-                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
-            <style>
-                #peopleCount::placeholder {
-                    color: #8796cf;
-                }
-            </style>
-
-            <label for="startDate" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Start Date:</label>
+                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95">
+            
+            <label for="startDate" style="background-color:transparent; box-shadow: none;color:#8796cf">Start Date:</label>
             <input type="date" id="startDate" name="startDate" required 
-                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
-            <style>
-                #startDate::placeholder {
-                    color: #8796cf;
-                }
-            </style>
-
-            <label for="endDate" style="background-color: #161c1c; box-shadow: none;color:#ab936f">End Date:</label>
+                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95">
+            
+            <label for="endDate" style="background-color:transparent; box-shadow: none;color:#8796cf">End Date:</label>
             <input type="date" id="endDate" name="endDate" required 
-                   style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
-            <style>
-                #endDate::placeholder {
-                    color: #8796cf;
-                }
-            </style>
-
-            <button type="submit" class="btn" style="background-color: #69759d; box-shadow: none;">Generate Itinerary</button>
+                   style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95">
+            
+            <button type="submit" class="btn" style="background-color: #69759d; box-shadow: none; transition: transform 0.3s ease, background-color 0.3s ease;">Generate Itinerary</button>
         </form>
 
-        <p id="loading-message" style="display: none; background-color: #161c1c; box-shadow: none;">Generating your itinerary... Please wait.</p>
+        <p id="loading-message" style="display: none; background-color:rgba(251, 255, 240, 0.6); box-shadow: none;">Generating your itinerary... Please wait.</p>
     </div>
+    <div style="width: 25%; padding: 20px; margin-right: 5%; position: fixed; top: 120px; right: 0;" class="paragraph-section">
+        <p style="text-align: right; background-color: transparent; color: #fbfff0; box-shadow: none; font-size: 1.5em; line-height: 1.6; opacity: 1; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease;">Enter your trip details, and our AI will generate a personalized itinerary for you.</p>
+    </div>
+    <div class="scroll-indicator" style="position: absolute; bottom: 50px; opacity: 0.7; left: 50%; transform: translateX(-50%);">
+        <p style="color: #fbfff0; text-align: center; font-size: 0.9em;">Scroll down to begin</p>
+        <div style="text-align: center; animation: bounce 2s infinite;">
+            <span style="color: #fbfff0; font-size: 24px;">↓</span>
+        </div>
+    </div>
+</div>
 
     <style>
         body, main {
-            background-color: #161c1c;
+            background-color: transparent;
             box-shadow: none;
+            scroll-behavior: smooth;
+            overflow-y: hidden;
+            height: 100vh;
         }
         
         input, textarea {
@@ -89,16 +69,181 @@
             border-color: rgba(22, 28, 28, 0.5) !important;
             border-radius: 20px !important;
             box-shadow: none !important;
-            color:#8796cf !important;
+            color:#5b6a95 !important;
             font-family: 'alok', sans-serif !important;
             font-size: 1em !important;
-            
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        input:focus, textarea:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
         }
         
         ::placeholder {
-            color: #8796cf !important;
+            color: #5b6a95 !important;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            background-color: #7a86ae !important;
+        }
+        
+        .header-container {
+            transition: all 0.8s ease;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .header-container {
+                flex-direction: column;
+                padding: 20px;
+            }
+            
+            .header-container > div {
+                width: 100% !important;
+                padding: 10px;
+                text-align: center;
+            }
+            
+            .header-container h1 {
+                text-align: center;
+            }
+            
+            .header-container p {
+                text-align: center;
+            }
+            
+            .plan-container {
+                width: 90% !important;
+                margin: 20px auto;
+                order: 2 !important;
+            }
+            
+            .header-section {
+                order: 1;
+            }
+            
+            .paragraph-section {
+                order: 3;
+            }
+        }
+        
+        /* Add these styles to prevent horizontal movement */
+        .header-container {
+            overflow-x: hidden !important;
+            position: relative;
+            width: 100vw !important;
+        }
+        
+        body {
+            overflow-x: hidden !important;
+        }
+        
+        header {
+            position: fixed;
+            width: 100%;
+            z-index: 2000;
         }
     </style>
 
     <script src="{{ url_for('static', filename='plan.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formContainer = document.querySelector('.plan-container');
+            const headerContainer = document.querySelector('.header-container');
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            let formRevealed = false;
+            
+            // Position elements at the top initially
+            document.querySelector('.header-section').style.alignSelf = 'flex-start';
+            document.querySelector('.paragraph-section').style.alignSelf = 'flex-start';
+            
+            function handleScroll(e) {
+                if (e.deltaY > 0 && !formRevealed) {
+                    e.preventDefault();
+                    showForm();
+                    window.removeEventListener('wheel', handleScroll);
+                }
+            }
+            
+            window.addEventListener('wheel', handleScroll, { passive: false });
+            
+            let touchStartY = 0;
+            
+            function handleTouchStart(e) {
+                touchStartY = e.touches[0].clientY;
+            }
+            
+            function handleTouchMove(e) {
+                if (!formRevealed) {
+                    const touchY = e.touches[0].clientY;
+                    if (touchStartY > touchY) {
+                        e.preventDefault();
+                        showForm();
+                        window.removeEventListener('touchstart', handleTouchStart);
+                        window.removeEventListener('touchmove', handleTouchMove);
+                    }
+                }
+            }
+            
+            window.addEventListener('touchstart', handleTouchStart, { passive: true });
+            window.addEventListener('touchmove', handleTouchMove, { passive: false });
+            
+            function showForm() {
+                // Fix header container position
+                headerContainer.style.minHeight = '100vh';
+                headerContainer.style.paddingTop = '5vh';
+                headerContainer.style.alignItems = 'center';
+                headerContainer.style.position = 'fixed';  // Fix the container position
+                headerContainer.style.overflowX = 'hidden';  // Prevent horizontal scroll
+                
+                // Hide scroll indicator
+                scrollIndicator.style.display = 'none';
+                
+                // Show form with fixed positioning
+                formContainer.style.opacity = '1';
+                formContainer.style.transition = 'opacity 0.8s ease';
+                
+                // Animate heading and paragraph
+                document.querySelector('.header-section h1').style.opacity = '1';
+                document.querySelector('.header-section h1').style.transform = 'translateY(0)';
+                document.querySelector('.paragraph-section p').style.opacity = '1';
+                document.querySelector('.paragraph-section p').style.transform = 'translateY(0)';
+                
+                formRevealed = true;
+                
+                // Enable header navigation
+                document.body.style.overflowY = 'hidden';
+                document.body.style.overflowX = 'hidden';  // Prevent horizontal scroll
+                
+                // Re-enable pointer events on the header
+                const header = document.querySelector('header');
+                if (header) {
+                    header.style.pointerEvents = 'auto';
+                    header.style.zIndex = '2000';  // Ensure header is above other elements
+                }
+            }
+            
+            scrollIndicator.addEventListener('click', function() {
+                showForm();
+                window.removeEventListener('wheel', handleScroll);
+                window.removeEventListener('touchstart', handleTouchStart);
+                window.removeEventListener('touchmove', handleTouchMove);
+            });
+        });
+    </script>
 {% endblock %}
