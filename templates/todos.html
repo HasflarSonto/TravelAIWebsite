@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-layout">
+    <div class="left-column">
+        <h1 class="itinerary-title">Trip Planning Checklist</h1>
+        <a href="{{ url_for('show_itinerary') }}" class="back-btn">← Back to Itinerary</a>
+    </div>
+    
+    <div class="right-column">
+        {% for day in trip_events %}
+        <h2 class="day-header">Day {{ loop.index }} - {{ day.date }}</h2>
+        {% for activity in day.activities %}
+        <div class="activity-row">
+            <div class="time-block">{{ activity.start_time }} to {{ activity.end_time }}</div>
+            <div class="activity-title">
+                {{ activity.title }}
+                <div class="event-confirmed">
+                    <span>Event Confirmed</span>
+                    <input type="checkbox" class="event-checkbox" {% if activity.confirmed %}checked{% endif %}>
+                </div>
+            </div>
+            <div class="location">{{ activity.location }}</div>
+            <button class="toggle-todos-btn" onclick="toggleTodos(this)">▼</button>
+            <div class="todo-items" data-activity-id="{{ activity.id }}" data-todos="{{ activity.todos|tojson|safe if activity.todos else '[]' }}">
+                {% for todo in activity.todos %}
+                <div class="todo-item">
+                    <span class="todo-label">{{ todo.text }}</span>
+                    <input type="checkbox" class="todo-checkbox" {% if todo.completed %}checked{% endif %}>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.page-layout {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    gap: 40px;
+}
+
+.left-column {
+    width: 300px;
+}
+
+.right-column {
+    flex: 1;
+}
+
+.itinerary-title {
+    color: #8796cf;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.back-btn {
+    color: #8796cf;
+    text-decoration: none;
+    font-size: 1.1em;
+}
+
+.day-header {
+    color: #8796cf;
+    font-size: 1.8em;
+    margin: 40px 0 20px 0;
+}
+
+.activity-row {
+    background: #161c1c;
+    border: 1px solid rgba(135, 150, 207, 0.2);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.time-block {
+    color: #8796cf;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.activity-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #8796cf;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.event-confirmed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7a9a;
+    font-size: 0.9em;
+}
+
+.location {
+    color: #6b7a9a;
+    margin-bottom: 15px;
+}
+
+.todo-items {
+    border-top: 1px solid rgba(135, 150, 207, 0.2);
+    padding-top: 15px;
+    margin-top: 15px;
+}
+
+.todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background: rgba(135, 150, 207, 0.1);
+    border-radius: 4px;
+    margin: 8px 0;
+}
+
+.todo-label {
+    color: #6b7a9a;
+}
+
+.todo-checkbox {
+    cursor: pointer;
+}
+
+.event-checkbox {
+    cursor: pointer;
+}
+
+.toggle-todos-btn {
+    background: transparent;
+    border: 1px solid #8796cf;
+    color: #8796cf;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 10px 0;
+    width: 40px;
+}
+
+.toggle-todos-btn:hover {
+    background: rgba(135, 150, 207, 0.1);
+}
+
+.toggle-todos-btn.active {
+    background: #8796cf;
+    color: #161c1c;
+}
+
+.activity-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+</style>
+
+<script src="{{ url_for('static', filename='todos.js') }}"></script>
+{% endblock %} 

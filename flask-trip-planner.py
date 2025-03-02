@@ -784,5 +784,35 @@ def add_event():
     return jsonify({"success": False, "error": "Day not found"}), 404
 
 
+@app.route('/api/trip/todos/save', methods=['POST'])
+def save_todos():
+    if 'trip_events' not in session:
+        return jsonify({"success": False, "error": "No itinerary found"}), 404
+    
+    data = request.json
+    if not data:
+        return jsonify({"success": False, "error": "No data provided"}), 400
+    
+    events = session['trip_events']
+    for day in events:
+        for activity in day['activities']:
+            if str(activity.get('id')) == str(data['activityId']):
+                activity['todos'] = data['todos']
+                activity['confirmed'] = data['eventConfirmed']
+                session.modified = True
+                return jsonify({"success": True})
+    
+    return jsonify({"success": False, "error": "Activity not found"}), 404
+
+
+@app.route('/todos')
+def show_todos():
+    if 'trip_events' not in session:
+        return redirect(url_for('home'))
+    
+    trip_events = session['trip_events']
+    return render_template('todos.html', trip_events=trip_events)
+
+
 if __name__ == '__main__':
     app.run(debug=True)

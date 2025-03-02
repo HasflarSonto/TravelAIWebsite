@@ -24,6 +24,9 @@
             <li style="margin: 0 20px; text-align: center;">
                 <a href="{{ url_for('show_itinerary') }}" style="color: #5b6a95; transition: color 0.3s ease; {% if request.path == url_for('show_itinerary') %}font-weight: bold;{% endif %}" onmouseover="this.style.color='#161c1c'" onmouseout="this.style.color='#5b6a95'">Itinerary</a>
             </li>
+            <li style="margin: 0 20px; text-align: center;">
+                <a href="{{ url_for('show_todos') }}" style="color: #5b6a95; transition: color 0.3s ease; {% if request.path == url_for('show_todos') %}font-weight: bold;{% endif %}" onmouseover="this.style.color='#161c1c'" onmouseout="this.style.color='#5b6a95'">Planning Checklist</a>
+            </li>
         </ul>
     </nav>
 

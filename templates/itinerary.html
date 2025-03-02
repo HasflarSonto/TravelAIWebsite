@@ -4,7 +4,10 @@
 
 {% block content %}
 <div class="itinerary-container">
-    <h1 class="itinerary-title">Your Trip Itinerary</h1>
+    <div class="header-actions">
+        <h1 class="itinerary-title">Your Trip Itinerary</h1>
+        <button class="ship-btn" onclick="window.location.href='/todos'">🚀 Ship Itinerary</button>
+    </div>
     
     <div id="itinerary-days">
         {% for day in trip_events %}
@@ -105,6 +108,20 @@
                 <button type="button" class="cancel-btn" onclick="closeAddModal()">Cancel</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Add this new modal for showing generated todos -->
+<div id="todosModal" class="modal">
+    <div class="modal-content wide-modal">
+        <h2>Trip Planning Checklist</h2>
+        <div id="todosList">
+            <!-- Todos will be populated here -->
+        </div>
+        <div class="button-group" style="justify-content: center; margin-top: 20px;">
+            <button type="button" class="save-btn" onclick="saveTodos()">Save Checklist</button>
+            <button type="button" class="cancel-btn" onclick="closeTodosModal()">Close</button>
+        </div>
     </div>
 </div>
 
@@ -321,6 +338,74 @@
         text-align: left;
     }
 }
+
+/* Add these new styles */
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.ship-btn {
+    background: transparent;
+    border: 1px solid #8796cf;
+    color: #8796cf;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.ship-btn:hover {
+    background: #8796cf;
+    color: #161c1c;
+}
+
+.wide-modal {
+    max-width: 800px !important;
+}
+
+.todo-group {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid rgba(135, 150, 207, 0.2);
+    border-radius: 8px;
+}
+
+.todo-group h3 {
+    color: #8796cf;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    padding: 8px;
+    background: rgba(135, 150, 207, 0.1);
+    border-radius: 4px;
+}
+
+.todo-checkbox {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.todo-label {
+    color: #6b7a9a;
+    flex-grow: 1;
+}
+
+.event-checkbox {
+    margin-left: 10px;
+    cursor: pointer;
+}
 </style>
 
 <script>
@@ -528,11 +613,101 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
 window.onclick = function(event) {
     const addModal = document.getElementById('addModal');
     const editModal = document.getElementById('editModal');
+    const todosModal = document.getElementById('todosModal');
     if (event.target == addModal) {
         closeAddModal();
     } else if (event.target == editModal) {
         closeModal();
+    } else if (event.target == todosModal) {
+        closeTodosModal();
     }
+}
+
+function generateTodos(activity) {
+    const todos = [];
+    const title = activity.title.toLowerCase();
+    
+    // Transportation related todos
+    if (title.includes('travel') || title.includes('flight') || title.includes('train') || title.includes('bus')) {
+        todos.push('Book transportation tickets');
+        todos.push('Check visa requirements');
+        todos.push('Arrange airport/station transfer');
+        todos.push('Download travel documents');
+    }
+    
+    // Restaurant related todos
+    if (title.includes('dinner') || title.includes('lunch') || title.includes('restaurant')) {
+        todos.push('Make restaurant reservation');
+        todos.push('Check dress code');
+        todos.push('Confirm dietary requirements');
+    }
+    
+    // Museum/attraction related todos
+    if (title.includes('museum') || title.includes('gallery') || title.includes('tour')) {
+        todos.push('Book tickets in advance');
+        todos.push('Check opening hours');
+        todos.push('Research guided tour options');
+    }
+    
+    // Hotel/accommodation related todos
+    if (title.includes('hotel') || title.includes('check-in') || title.includes('accommodation')) {
+        todos.push('Confirm reservation');
+        todos.push('Request early check-in/late check-out');
+        todos.push('Save hotel contact information');
+    }
+    
+    return todos;
+}
+
+function shipItinerary() {
+    const modal = document.getElementById('todosModal');
+    const todosList = document.getElementById('todosList');
+    todosList.innerHTML = '';
+    
+    // Collect all activities
+    const activities = document.querySelectorAll('.activity-row');
+    
+    activities.forEach(activity => {
+        const title = activity.querySelector('h3').textContent;
+        const time = activity.querySelector('.time-block').textContent;
+        const location = activity.querySelector('.location').textContent;
+        
+        const todos = generateTodos({title, time, location});
+        
+        if (todos.length > 0) {
+            const todoGroup = document.createElement('div');
+            todoGroup.className = 'todo-group';
+            
+            const header = document.createElement('h3');
+            header.innerHTML = `
+                ${title}
+                <input type="checkbox" class="event-checkbox" title="Mark event as confirmed">
+            `;
+            
+            const todoItems = todos.map(todo => `
+                <div class="todo-item">
+                    <input type="checkbox" class="todo-checkbox">
+                    <span class="todo-label">${todo}</span>
+                </div>
+            `).join('');
+            
+            todoGroup.innerHTML = header.outerHTML + todoItems;
+            todosList.appendChild(todoGroup);
+        }
+    });
+    
+    modal.style.display = 'block';
+}
+
+function closeTodosModal() {
+    document.getElementById('todosModal').style.display = 'none';
+}
+
+function saveTodos() {
+    // Here you would typically save the state of all checkboxes
+    // For now, we'll just show a success message
+    alert('Checklist saved!');
+    closeTodosModal();
 }
 </script>
 {% endblock %}
