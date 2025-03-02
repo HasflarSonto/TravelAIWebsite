@@ -71,13 +71,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     activityRows.forEach(row => {
         const todoItems = row.querySelector('.todo-items');
-        todoItems.style.display = 'none'; // Hide todos initially
+        const title = row.querySelector('.activity-title').firstChild.textContent.trim();
         
-        // Only generate todos if container is empty
         if (!todoItems.children.length) {
-            const title = row.querySelector('.activity-title').firstChild.textContent.trim();
             const generatedTodos = generateTodosForActivity(title);
-            
             generatedTodos.forEach(todoText => {
                 const todoItem = createTodoItem(todoText, false);
                 todoItems.appendChild(todoItem);
@@ -85,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add event listener for checkbox changes
+    // Save checkbox states
     document.addEventListener('change', async function(e) {
         if (e.target.matches('.todo-checkbox, .event-checkbox')) {
             const activityRow = e.target.closest('.activity-row');

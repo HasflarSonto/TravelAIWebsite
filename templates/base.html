@@ -5,39 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Trip Planner{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="preload" href="{{ url_for('static', filename='yellow logo.gif') }}" as="image">
+    <link rel="preload" href="{{ url_for('static', filename='black logo.gif') }}" as="image">
     <style>
         /* Base styles */
         body {
-            background-color: {% if request.path == url_for('home') %}#fbfff0{% else %}#161c1c{% endif %};
+            background-color: #161c1c !important;
             color: #8796cf;
             margin: 0;
             min-height: 100vh;
             position: relative;
-            padding-bottom: 60px;
+            padding-bottom: 0 !important;
         }
 
         /* Navigation styles */
         nav {
             background-color: transparent;
             padding: 20px 0;
+            width: 100%;
+            opacity: 1 !important;
+            visibility: visible !important;
         }
 
         nav ul {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 0 5%;
+            gap: 40px;
+            padding: 0;
             margin: 0;
             list-style: none;
         }
 
         nav li {
-            margin: 0 20px;
             text-align: center;
         }
 
         nav a {
-            color: {% if request.path == url_for('home') %}#161c1c{% else %}#5b6a95{% endif %};
+            color: #5b6a95;
             text-decoration: none;
             transition: all 0.3s ease;
             font-size: 1.1em;
@@ -55,7 +60,7 @@
             height: 2px;
             bottom: -5px;
             left: 50%;
-            background-color: {% if request.path == url_for('home') %}#161c1c{% else %}#ffffff{% endif %};
+            background-color: #ffffff;
             transition: all 0.3s ease;
             transform: translateX(-50%);
         }
@@ -65,8 +70,12 @@
         }
 
         .logo-link {
-            display: inline-block;
-            transition: transform 0.3s ease;
+            display: inline-block !important;
+            transition: transform 0.3s ease !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            z-index: 2001 !important;
+            position: relative !important;
         }
 
         .logo-link:hover {
@@ -74,36 +83,17 @@
         }
 
         .logo-link img {
-            height: 50px;
-            width: auto;
-            cursor: pointer;
-        }
-
-        /* Footer styles */
-        .footer {
-            text-align: center;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            color: #5b6a95;
-            padding: 15px 0;
-            background: {% if request.path == url_for('home') %}rgba(251, 255, 240, 0.9){% else %}rgba(22, 28, 28, 0.9){% endif %};
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border-top: 1px solid rgba(91, 106, 149, 0.1);
-            z-index: 1000;
-        }
-
-        .footer p {
-            margin: 0;
-            font-size: 0.9em;
+            height: 50px !important;
+            width: auto !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
         }
 
         /* Main content area */
         main {
-            padding: 20px;
-            margin-bottom: 60px;
+            background-color: #161c1c !important;
+            width: 100%;
             position: relative;
             z-index: 1;
         }
@@ -111,12 +101,12 @@
         /* Active link styles */
         nav a.active {
             font-weight: bold;
-            color: {% if request.path == url_for('home') %}#161c1c{% else %}#8796cf{% endif %};
+            color: #8796cf;
         }
 
         /* Hover effects */
         nav a:not(.logo-link):hover {
-            color: {% if request.path == url_for('home') %}#161c1c{% else %}#ffffff{% endif %};
+            color: #ffffff;
             transform: translateY(-2px);
         }
 
@@ -139,16 +129,31 @@
                 padding-bottom: 80px;
             }
         }
+
+        /* Ensure logo container is always visible */
+        nav ul li:nth-child(3) {
+            opacity: 1 !important;
+            visibility: visible !important;
+            z-index: 2001 !important;
+        }
+
+        /* Remove the footer class entirely */
+        .footer {
+            display: none !important;
+        }
+
+        /* Add preload for logo images */
+        body::after {
+            content: url("{{ url_for('static', filename='yellow logo.gif') }}") url("{{ url_for('static', filename='black logo.gif') }}");
+            display: none;
+        }
     </style>
 </head>
 <body>
     <nav>
         <ul>
-            <li>
-                <a href="{{ url_for('plan') }}" {% if request.path == url_for('plan') %}class="active"{% endif %}>
-                    Plan a Trip
-                </a>
-            </li>
+            <li><a href="{{ url_for('plan') }}" {% if request.path == url_for('plan') %}class="active"{% endif %}>Plan a Trip</a></li>
+            <li><a href="{{ url_for('suggestions') }}" {% if request.path == url_for('suggestions') %}class="active"{% endif %}>Suggestions</a></li>
             <li>
                 <a href="{{ url_for('home') }}" class="logo-link">
                     {% if request.path == url_for('home') %}
@@ -158,20 +163,30 @@
                     {% endif %}
                 </a>
             </li>
-            <li>
-                <a href="{{ url_for('show_itinerary') }}" {% if request.path == url_for('show_itinerary') %}class="active"{% endif %}>
-                    View Itinerary
-                </a>
-            </li>
+            <li><a href="{{ url_for('show_itinerary') }}" {% if request.path == url_for('show_itinerary') %}class="active"{% endif %}>View Itinerary</a></li>
+            <li><a href="{{ url_for('todos') }}" {% if request.path == url_for('todos') %}class="active"{% endif %}>Todos</a></li>
         </ul>
     </nav>
+
+    {% if request.path == url_for('plan') %}
+    <div class="page-header">
+        <h1>Plan Your Trip</h1>
+    </div>
+    {% endif %}
 
     <main>
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="footer">
-        <p>&copy; 2025 Trip Planner AI | Built with Flask & Claude AI</p>
-    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const logo = document.querySelector('.logo-link img');
+            if (logo) {
+                logo.style.opacity = '1';
+                logo.style.visibility = 'visible';
+                logo.style.display = 'block';
+            }
+        });
+    </script>
 </body>
 </html>

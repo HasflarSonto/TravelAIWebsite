@@ -4,6 +4,13 @@
 <div class="page-layout">
     <div class="left-column">
         <h1 class="itinerary-title">Trip Planning Checklist</h1>
+        <div id="ai-output" style="min-height: 100px; padding: 20px; background: rgba(22, 28, 28, 0.7); border-radius: 15px; margin: 20px 0; color: #8796cf;">
+            <p class="placeholder-text" style="color: rgba(135, 150, 207, 0.6); font-style: italic;">Select a task to get AI assistance...</p>
+        </div>
+        <div id="ai-loading" style="display: none; text-align: center; padding: 20px;">
+            <div class="loading-spinner"></div>
+            <p style="color: #8796cf;">Getting AI assistance...</p>
+        </div>
         <a href="{{ url_for('show_itinerary') }}" class="back-btn">← Back to Itinerary</a>
     </div>
     
@@ -15,9 +22,12 @@
             <div class="time-block">{{ activity.start_time }} to {{ activity.end_time }}</div>
             <div class="activity-title">
                 {{ activity.title }}
-                <div class="event-confirmed">
-                    <span>Event Confirmed</span>
-                    <input type="checkbox" class="event-checkbox" {% if activity.confirmed %}checked{% endif %}>
+                <div class="event-controls">
+                    <div class="event-confirmed">
+                        <span>Event Confirmed</span>
+                        <input type="checkbox" class="event-checkbox" {% if activity.confirmed %}checked{% endif %}>
+                    </div>
+                    <button class="ai-help-btn" onclick="getAIHelp('{{ activity.title }}')" title="Get AI assistance">⭐</button>
                 </div>
             </div>
             <div class="location">{{ activity.location }}</div>
@@ -150,6 +160,13 @@
     margin-bottom: 10px;
 }
 
+.event-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
 .event-confirmed {
     display: flex;
     align-items: center;
@@ -240,6 +257,45 @@
     align-items: center;
     gap: 15px;
 }
+
+/* Add to existing styles */
+.ai-help-btn {
+    background: transparent;
+    border: 1px solid #8796cf;
+    color: #8796cf;
+    cursor: pointer;
+    font-size: 1em;
+    padding: 4px 8px;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-help-btn:hover {
+    transform: scale(1.1);
+    color: #ffffff;
+    border-color: #ffffff;
+    background: rgba(135, 150, 207, 0.2);
+}
+
+.loading-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(135, 150, 207, 0.3);
+    border-top: 3px solid #8796cf;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 </style>
 
 <script src="{{ url_for('static', filename='todos.js') }}"></script>
@@ -290,6 +346,43 @@ function toggleTodos(button) {
     } else {
         todoItems.style.maxHeight = '0';
         todoItems.style.opacity = '0';
+    }
+}
+
+async function getAIHelp(taskText) {
+    const outputDiv = document.getElementById('ai-output');
+    const loadingDiv = document.getElementById('ai-loading');
+    
+    outputDiv.style.display = 'none';
+    loadingDiv.style.display = 'block';
+    
+    try {
+        const response = await fetch('/api/ai/todo-help', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ task: taskText })
+        });
+        
+        const data = await response.json();
+        
+        loadingDiv.style.display = 'none';
+        outputDiv.style.display = 'block';
+        
+        if (data.success) {
+            outputDiv.innerHTML = `
+                <h3 style="color: #8796cf; margin-bottom: 10px;">AI Assistance for:</h3>
+                <p style="color: #8796cf; margin-bottom: 15px;">${taskText}</p>
+                <div style="color: #6b7a9a; white-space: pre-line;">${data.response}</div>
+            `;
+        } else {
+            outputDiv.innerHTML = `<p style="color: #ff6b6b;">Error: ${data.error}</p>`;
+        }
+    } catch (error) {
+        loadingDiv.style.display = 'none';
+        outputDiv.style.display = 'block';
+        outputDiv.innerHTML = '<p style="color: #ff6b6b;">An error occurred while getting AI assistance</p>';
     }
 }
 </script>

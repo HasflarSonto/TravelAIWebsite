@@ -3,52 +3,52 @@
 {% block title %}Plan Your Trip - Trip Planner{% endblock %}
 
 {% block content %}
-<div class="header-container" style="display: flex; justify-content: flex-start; width: 100%; margin-bottom: 20px; opacity: 1; min-height: 100vh; align-items: flex-start; flex-direction: row; padding-top: 0; flex-wrap: wrap; position: absolute; top: 0; left: 0;">
+<div class="header-container" style="display: flex; justify-content: flex-start; width: 100%; margin-bottom: 20px; opacity: 1; min-height: 100vh; align-items: flex-start; flex-direction: row; padding-top: 0; flex-wrap: wrap; position: absolute; top: 0; left: 0; background-color: #161c1c;">
     <div style="width: 25%; padding: 20px; margin-left: 5%;" class="header-section">
-        <h1 style="text-align: left; color: rgba(251, 255, 240, 0.8); font-size: 3.5em; margin-bottom: 30px; box-shadow: none; opacity: 1; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease;">Plan Your Trip</h1>
-    </div>
-    
-    <div class="plan-container" style="background-color:transparent; box-shadow: none; opacity: 0; width: 40%; max-width: 800px; margin: 0 auto; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10;">
+        <h1 style="text-align: left; color: rgba(251, 255, 240, 0.8); font-size: 3.5em; margin-bottom: 30px; box-shadow: none; opacity: 0; transform: translateY(20px); transition: opacity 1s ease, transform 1s ease;">Plan Your Trip</h1>
+            </div>
+
+    <div class="plan-container" style="background-color:transparent; box-shadow: none; opacity: 0; width: 40%; max-width: 800px; margin: 0 auto; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background-color: rgba(22, 28, 28, 0.8) !important;">
         <form id="trip-form" style="background-color:transparent; box-shadow: none; outline-color: rgba(22, 28, 28, 0.5);">
             
             <label for="startLocation" style="background-color:transparent; box-shadow: none; color:#8796cf">Starting Location:</label>
             <input type="text" id="startLocation" name="startLocation" placeholder="e.g., Beijing, China" required 
-                   style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95">
+                   style="background-color: rgba(22, 28, 28, 0.5) !important; border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
             
             <label for="endLocation" style="background-color:transparent; box-shadow: none;color:#8796cf">Destination:</label>
             <input type="text" id="endLocation" name="endLocation" placeholder="e.g., Rome, Italy" required 
-                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95">
+                style="background-color: rgba(22, 28, 28, 0.5) !important; border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
             
             <label for="naturalLanguageInput" style="background-color:transparent; box-shadow: none;color:#8796cf">Describe your trip:</label>
             <textarea id="naturalLanguageInput" name="naturalLanguageInput" placeholder="I want to visit Italy and explore historic sites..." required 
-                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95"></textarea>
+                style="background-color: rgba(22, 28, 28, 0.5) !important; border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf"></textarea>
             
             <label for="budget" style="background-color:transparent; box-shadow: none;color:#8796cf">Budget ($):</label>
             <input type="number" id="budget" name="budget" required 
-                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95">
+                style="background-color: rgba(22, 28, 28, 0.5) !important; border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
             
             <label for="peopleCount" style="background-color:transparent; box-shadow: none;color:#8796cf">Number of Travelers:</label>
             <input type="number" id="peopleCount" name="peopleCount" required 
-                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95">
+                style="background-color: rgba(22, 28, 28, 0.5) !important; border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
             
             <label for="startDate" style="background-color:transparent; box-shadow: none;color:#8796cf">Start Date:</label>
             <input type="date" id="startDate" name="startDate" required 
-                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95">
+                style="background-color: rgba(22, 28, 28, 0.5) !important; border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
             
             <label for="endDate" style="background-color:transparent; box-shadow: none;color:#8796cf">End Date:</label>
             <input type="date" id="endDate" name="endDate" required 
-                   style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#5b6a95">
+                   style="background-color: rgba(22, 28, 28, 0.5) !important; border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
             
-            <button type="submit" class="btn" style="background-color: #69759d; box-shadow: none; transition: transform 0.3s ease, background-color 0.3s ease;">Generate Itinerary</button>
+            <button type="submit" class="btn" style="background-color: #69759d !important; box-shadow: none; transition: all 0.3s ease; padding: 12px 24px; border-radius: 25px; border: none; color: #fbfff0; font-size: 1.1em; cursor: pointer; margin-top: 20px; width: auto; min-width: 200px;">Generate Itinerary</button>
         </form>
 
-        <p id="loading-message" style="display: none; background-color:rgba(251, 255, 240, 0.6); box-shadow: none;">Generating your itinerary... Please wait.</p>
+        <p id="loading-message" style="display: none; background-color:rgba(251, 255, 240, 0.6); box-shadow: none; color: #8796cf !important;">Generating your itinerary... Please wait.</p>
     </div>
-    <div style="width: 25%; padding: 20px; margin-right: 5%; position: fixed; top: 120px; right: 0;" class="paragraph-section">
-        <p style="text-align: right; background-color: transparent; color: #fbfff0; box-shadow: none; font-size: 1.5em; line-height: 1.6; opacity: 1; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease;">Enter your trip details, and our AI will generate a personalized itinerary for you.</p>
+    <div style="width: 25%; padding: 20px; margin-right: 2%; position: fixed; top: 120px; right: 0; display: flex; justify-content: flex-end; align-items: center;" class="paragraph-section">
+        <p style="text-align: right; background-color: transparent; color: #fbfff0; box-shadow: none; font-size: 1.5em; line-height: 1.6; opacity: 0; transform: translateY(20px); transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);">Enter your trip details, and our AI will generate a personalized itinerary for you.</p>
     </div>
-    <div class="scroll-indicator" style="position: absolute; bottom: 50px; opacity: 0.7; left: 50%; transform: translateX(-50%);">
-        <p style="color: #fbfff0; text-align: center; font-size: 0.9em;">Scroll down to begin</p>
+    <div class="scroll-indicator" style="position: fixed; bottom: 50px; opacity: 0.7; left: 50%; transform: translateX(-50%); z-index: 1000; cursor: pointer;">
+        <p style="color: #fbfff0; text-align: center; font-size: 0.9em; margin-bottom: 10px;">Scroll down to begin</p>
         <div style="text-align: center; animation: bounce 2s infinite;">
             <span style="color: #fbfff0; font-size: 24px;">↓</span>
         </div>
@@ -57,7 +57,7 @@
 
     <style>
         body, main {
-            background-color: transparent;
+            background-color: #161c1c !important;
             box-shadow: none;
             scroll-behavior: smooth;
             overflow-y: hidden;
@@ -66,33 +66,85 @@
         
         input, textarea {
             background-color: rgba(22, 28, 28, 0.5) !important;
-            border-color: rgba(22, 28, 28, 0.5) !important;
+            border: 2px solid rgba(251, 255, 240, 0.2) !important;  /* Brighter border */
             border-radius: 20px !important;
             box-shadow: none !important;
-            color:#5b6a95 !important;
+            color: #fbfff0 !important;  /* Brighter text */
             font-family: 'alok', sans-serif !important;
             font-size: 1em !important;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease !important;
         }
         
         input:focus, textarea:focus {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+            box-shadow: 0 4px 8px rgba(251, 255, 240, 0.1) !important;
+            border-color: rgba(251, 255, 240, 0.4) !important;  /* Brighter focus border */
+            background-color: rgba(22, 28, 28, 0.7) !important;
+        }
+        
+        /* Make calendar icon white */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.8;
+            cursor: pointer;
+        }
+        
+        /* Smooth transition for Plan Your Trip text */
+        .header-section h1 {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            animation: none !important;  /* Remove the previous animation */
+        }
+
+        /* Ensure logo is visible immediately */
+        .logo-link, .logo-link img {
+            opacity: 1 !important;
+            visibility: visible !important;
+            z-index: 2001 !important;
+            transition: none !important;
+        }
+
+        nav {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* Update the form reveal animation */
+        .plan-container {
+            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 1s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        /* Ensure text remains visible */
+        input::placeholder, textarea::placeholder {
+            color: rgba(251, 255, 240, 0.6) !important;
+        }
+
+        label {
+            color: rgba(251, 255, 240, 0.8) !important;
         }
         
         ::placeholder {
-            color: #5b6a95 !important;
+            color: rgba(135, 150, 207, 0.6) !important;
         }
         
         .btn:hover {
-            transform: translateY(-3px);
+            transform: translateY(-3px) !important;
             background-color: #7a86ae !important;
+            box-shadow: 0 4px 15px rgba(105, 117, 157, 0.3) !important;
+        }
+        
+        .btn:active {
+            transform: translateY(-1px) !important;
         }
         
         .header-container {
             transition: all 0.8s ease;
             height: 100vh;
             overflow: hidden;
+            background-color: #161c1c !important;
+            padding-top: 80px !important;
         }
         
         @keyframes bounce {
@@ -110,7 +162,7 @@
         @media (max-width: 992px) {
             .header-container {
                 flex-direction: column;
-                padding: 20px;
+                padding-top: 100px !important;
             }
             
             .header-container > div {
@@ -138,7 +190,14 @@
             }
             
             .paragraph-section {
-                order: 3;
+                position: static !important;
+                width: 90% !important;
+                margin: 20px auto !important;
+                text-align: center !important;
+            }
+            
+            .header-section h1 {
+                text-align: center !important;
             }
         }
         
@@ -153,12 +212,148 @@
             overflow-x: hidden !important;
         }
         
-        header {
-            position: fixed;
+        header, nav {
+            position: fixed !important;
+            top: 0;
+            left: 0;
             width: 100%;
             z-index: 2000;
+            background-color: rgba(22, 28, 28, 0.95);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Override any light background elements */
+        * {
+            background-color: transparent;
+        }
+
+        /* Ensure text is visible on dark background */
+        h1, p {
+            color: rgba(251, 255, 240, 0.8) !important;
+        }
+
+        /* Add subtle gradient to background */
+        .header-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #161c1c 0%, #1a2121 100%);
+            z-index: -1;
+        }
+        
+        /* Update text animations */
+        .header-section h1,
+        .paragraph-section p {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            animation: none !important;
+        }
+        
+        /* Remove any conflicting animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .plan-container {
+            margin-top: 80px !important;
+        }
+
+        /* Update scroll indicator animation */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .scroll-indicator {
+            transition: opacity 0.3s ease;
+        }
+
+        .scroll-indicator:hover {
+            opacity: 1;
+        }
+
+        /* Add plane animation styles */
+        .loading-animation {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(22, 28, 28, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .plane-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .plane {
+            position: absolute;
+            font-size: 3em;
+            animation: flyPlane 3s infinite linear;
+        }
+
+        .loading-text {
+            color: #8796cf;
+            font-size: 1.5em;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        @keyframes flyPlane {
+            0% {
+                left: -10%;
+                transform: translateY(0) rotate(10deg);
+            }
+            25% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+            50% {
+                transform: translateY(0) rotate(10deg);
+            }
+            75% {
+                transform: translateY(20px) rotate(10deg);
+            }
+            100% {
+                left: 110%;
+                transform: translateY(0) rotate(10deg);
+            }
         }
     </style>
+
+    <div class="loading-animation" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(22, 28, 28, 0.95); z-index: 2000;">
+        <div style="position: relative; width: 100%; height: 200px; overflow: hidden;">
+            <div class="plane" style="position: absolute; font-size: 3em; animation: flyPlane 3s infinite linear;">✈️</div>
+        </div>
+        <div style="color: #8796cf; font-size: 1.5em; text-align: center; margin-top: 20px;">
+            Generating your trip plan...
+        </div>
+    </div>
 
     <script src="{{ url_for('static', filename='plan.js') }}"></script>
     <script>
@@ -218,11 +413,21 @@
                 formContainer.style.opacity = '1';
                 formContainer.style.transition = 'opacity 0.8s ease';
                 
-                // Animate heading and paragraph
-                document.querySelector('.header-section h1').style.opacity = '1';
-                document.querySelector('.header-section h1').style.transform = 'translateY(0)';
-                document.querySelector('.paragraph-section p').style.opacity = '1';
-                document.querySelector('.paragraph-section p').style.transform = 'translateY(0)';
+                // Smoother text animations with delay
+                const h1Element = document.querySelector('.header-section h1');
+                const pElement = document.querySelector('.paragraph-section p');
+
+                // Animate h1 first
+                setTimeout(() => {
+                    h1Element.style.opacity = '1';
+                    h1Element.style.transform = 'translateY(0)';
+                }, 100);
+
+                // Animate paragraph with delay
+                setTimeout(() => {
+                    pElement.style.opacity = '1';
+                    pElement.style.transform = 'translateY(0)';
+                }, 600); // 500ms delay after h1
                 
                 formRevealed = true;
                 
@@ -244,6 +449,47 @@
                 window.removeEventListener('touchstart', handleTouchStart);
                 window.removeEventListener('touchmove', handleTouchMove);
             });
+
+            // Ensure logo is visible immediately
+            const logo = document.querySelector('.logo-link');
+            if (logo) {
+                logo.style.opacity = '1';
+                logo.style.visibility = 'visible';
+            }
+        });
+
+        document.getElementById('trip-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading animation
+            const loadingAnimation = document.querySelector('.loading-animation');
+            loadingAnimation.style.display = 'flex';
+            
+            try {
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData.entries());
+                
+                const response = await fetch('/api/trip/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    window.location.href = '/suggestions';
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while generating the trip plan');
+            } finally {
+                loadingAnimation.style.display = 'none';
+            }
         });
     </script>
 {% endblock %}

@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function displayItinerary(events) {
         const itineraryList = document.getElementById("itinerary-list");
-        itineraryList.innerHTML = ""; // Clear previous content
+        itineraryList.innerHTML = "";
 
         if (events.length === 0) {
             itineraryList.innerHTML = "<p>No itinerary found. Please create a trip first.</p>";
@@ -26,7 +26,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let currentDate = "";
         events.forEach(event => {
-            // Insert a date header when the date changes
             if (event.date !== currentDate) {
                 currentDate = event.date;
                 const dateHeader = document.createElement("h2");
@@ -37,19 +36,49 @@ document.addEventListener("DOMContentLoaded", function () {
                 itineraryList.appendChild(dateHeader);
             }
 
-            // Create an event card
             const eventDiv = document.createElement("div");
             eventDiv.className = "itinerary-event";
+            eventDiv.dataset.eventId = event.id; // Add event ID to the div
 
             eventDiv.innerHTML = `
                 <div class="event-container">
                     <h3 class="event-title">${event.title || "Untitled Event"}</h3>
                     <p class="event-time">${event.start_time} → ${event.end_time}</p>
                     <p class="event-location">${event.location}</p>
-                    <p class="event-location">cost: ${event.cost}$</p>
+                    <p class="event-cost">cost: ${event.cost}$</p>
                     <div class="event-buttons">
                         <button class="confirm-btn" data-id="${event.id}">Confirm</button>
                         <button class="modify-btn" data-id="${event.id}">Modify</button>
+                    </div>
+                </div>
+                <div id="edit-form-${event.id}" class="edit-form-container" style="display: none;">
+                    <div class="edit-form">
+                        <h2>Edit Event</h2>
+                        <div class="form-group">
+                            <label for="editTitle-${event.id}">Title</label>
+                            <input type="text" id="editTitle-${event.id}" value="${event.title}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editStartTime-${event.id}">Start Time</label>
+                            <input type="time" id="editStartTime-${event.id}" value="${event.start_time}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editEndTime-${event.id}">End Time</label>
+                            <input type="time" id="editEndTime-${event.id}" value="${event.end_time}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editLocation-${event.id}">Location</label>
+                            <input type="text" id="editLocation-${event.id}" value="${event.location}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editCost-${event.id}">Cost ($)</label>
+                            <input type="number" id="editCost-${event.id}" value="${event.cost}" step="0.01" required>
+                        </div>
+                        <div class="button-group">
+                            <button class="save-btn" onclick="saveEventChanges('${event.id}')">Save</button>
+                            <button class="delete-btn" onclick="deleteEvent('${event.id}')">Delete</button>
+                            <button class="cancel-btn" onclick="cancelEdit('${event.id}')">Cancel</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -89,23 +118,72 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function modifyEvent(eventId) {
-        const modificationText = prompt("Describe how you'd like to modify this event:");
-        if (!modificationText) return;
+        // Hide any other open edit forms
+        document.querySelectorAll('.edit-form-container').forEach(form => {
+            form.style.display = 'none';
+        });
+        
+        // Show this event's edit form
+        const editForm = document.getElementById(`edit-form-${eventId}`);
+        editForm.style.display = 'block';
+    }
+
+    function saveEventChanges(eventId) {
+        const formData = {
+            title: document.getElementById(`editTitle-${eventId}`).value,
+            start_time: document.getElementById(`editStartTime-${eventId}`).value,
+            end_time: document.getElementById(`editEndTime-${eventId}`).value,
+            location: document.getElementById(`editLocation-${eventId}`).value,
+            cost: parseFloat(document.getElementById(`editCost-${eventId}`).value)
+        };
 
         fetch(`/api/trip/event/${eventId}/modify`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ modificationText })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert("Event modified!");
                 fetchItinerary();
             } else {
-                alert("Error modifying event: " + data.error);
+                alert('Error modifying event: ' + data.error);
             }
         })
-        .catch(error => console.error("Error modifying event:", error));
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to modify event');
+        });
+    }
+
+    function deleteEvent(eventId) {
+        if (!confirm('Are you sure you want to delete this event?')) return;
+
+        fetch(`/api/trip/event/${eventId}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`edit-form-${eventId}`).style.display = 'none';
+                fetchItinerary();
+            } else {
+                alert('Error deleting event: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete event');
+        });
+    }
+
+    function cancelEdit(eventId) {
+        document.getElementById(`edit-form-${eventId}`).style.display = 'none';
     }
 });
+

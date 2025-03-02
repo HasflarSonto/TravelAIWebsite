@@ -522,7 +522,7 @@ def home():
 
 @app.route('/plan')
 def plan():
-    return render_template("plan.html")
+    return render_template('plan.html')
 
 
 @app.route('/itinerary')
@@ -744,15 +744,24 @@ def modify_event(event_id):
 
 @app.route('/api/trip/event/<event_id>/delete', methods=['DELETE'])
 def delete_event(event_id):
+    """Deletes an event from the trip."""
     if 'trip_events' not in session:
         return jsonify({"success": False, "error": "No itinerary found"}), 404
     
-    events = session['trip_events']
-    for day in events:
-        day['activities'] = [a for a in day['activities'] if str(a.get('id')) != str(event_id)]
-    
-    session.modified = True
-    return jsonify({"success": True})
+    try:
+        # Find and remove the event from trip_events
+        trip_events = session['trip_events']
+        for day in trip_events:
+            day['activities'] = [activity for activity in day['activities'] 
+                               if str(activity.get('id')) != str(event_id)]
+        
+        session['trip_events'] = trip_events
+        session.modified = True
+        
+        return jsonify({"success": True})
+    except Exception as e:
+        print(f"❌ Error deleting event: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @app.route('/api/trip/event/add', methods=['POST'])
@@ -784,34 +793,115 @@ def add_event():
     return jsonify({"success": False, "error": "Day not found"}), 404
 
 
+@app.route('/todos')
+def todos():
+    """Renders the todos page."""
+    if 'trip_events' not in session:
+        return redirect(url_for('plan'))
+    return render_template('todos.html', trip_events=session.get('trip_events', []))
+
+
 @app.route('/api/trip/todos/save', methods=['POST'])
 def save_todos():
-    if 'trip_events' not in session:
-        return jsonify({"success": False, "error": "No itinerary found"}), 404
-    
-    data = request.json
-    if not data:
-        return jsonify({"success": False, "error": "No data provided"}), 400
-    
-    events = session['trip_events']
-    for day in events:
-        for activity in day['activities']:
-            if str(activity.get('id')) == str(data['activityId']):
-                activity['todos'] = data['todos']
-                activity['confirmed'] = data['eventConfirmed']
-                session.modified = True
-                return jsonify({"success": True})
-    
-    return jsonify({"success": False, "error": "Activity not found"}), 404
+    """Saves the todo state for an activity."""
+    try:
+        data = request.json
+        activity_id = data.get('activityId')
+        todos = data.get('todos', [])
+        event_confirmed = data.get('eventConfirmed', False)
+        
+        # Update the todos in session
+        trip_events = session.get('trip_events', [])
+        for day in trip_events:
+            for activity in day['activities']:
+                if activity['id'] == activity_id:
+                    activity['todos'] = todos
+                    activity['confirmed'] = event_confirmed
+                    break
+        
+        session['trip_events'] = trip_events
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
-@app.route('/todos')
-def show_todos():
-    if 'trip_events' not in session:
-        return redirect(url_for('home'))
-    
-    trip_events = session['trip_events']
-    return render_template('todos.html', trip_events=trip_events)
+@app.route('/api/trip/generate', methods=['POST'])
+def generate_trip():
+    try:
+        data = request.json
+        
+        # Validate required fields
+        required_fields = ['destination', 'start_date', 'end_date', 'budget']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'success': False, 'error': f'Missing {field}'}), 400
+        
+        # Store trip data in session
+        session['trip_data'] = {
+            'destination': data['destination'],
+            'start_date': data['start_date'],
+            'end_date': data['end_date'],
+            'budget': float(data['budget'])
+        }
+        
+        # Initialize empty trip events
+        session['trip_events'] = []
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/ai/todo-help', methods=['POST'])
+def get_ai_todo_help():
+    """Generates AI assistance for a specific todo/task."""
+    try:
+        data = request.json
+        task = data.get('task')
+        
+        if not task:
+            return jsonify({
+                "success": False,
+                "error": "No task provided"
+            }), 400
+
+        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        
+        prompt = f"""
+        As a travel planning assistant, provide helpful advice for this travel task:
+        "{task}"
+
+        Consider:
+        1. Best practices and tips
+        2. Common pitfalls to avoid
+        3. Useful resources or websites
+        4. Timing recommendations
+        5. Money-saving tips if applicable
+
+        Keep the response concise but informative, focusing on practical advice.
+        """
+
+        response = client.messages.create(
+            model="claude-3-opus-20240229",
+            max_tokens=500,
+            temperature=0.7,
+            system="You are a helpful travel planning assistant providing practical advice for specific travel tasks.",
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        ai_response = response.content[0].text.strip()
+        
+        return jsonify({
+            "success": True,
+            "response": ai_response
+        })
+
+    except Exception as e:
+        print(f"❌ Error getting AI assistance: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": "Failed to get AI assistance"
+        }), 500
 
 
 if __name__ == '__main__':

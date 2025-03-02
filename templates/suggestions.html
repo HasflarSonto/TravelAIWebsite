@@ -97,6 +97,9 @@
     padding: 20px;
     margin: 20px 0;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    touch-action: none;
+    user-select: none;
+    cursor: grab;
 }
 
 .activity-title {
@@ -264,6 +267,30 @@
     font-style: italic;
     margin-top: 10px;
 }
+
+.suggestion-card-dragging {
+    cursor: grabbing;
+}
+
+.like-indicator, .dislike-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 4em;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.like-indicator {
+    right: 20px;
+    color: #4CAF50;
+}
+
+.dislike-indicator {
+    left: 20px;
+    color: #f44336;
+}
 </style>
 
 <script>
@@ -344,12 +371,25 @@ function showSuggestion() {
     const slotSuggestions = suggestions.filter(s => s.slot_index === currentSlotIndex);
     const currentSuggestion = slotSuggestions[currentOptionIndex];
     
-    document.querySelector('.activity-title').textContent = currentSuggestion.title;
-    document.querySelector('.activity-description').textContent = currentSuggestion.description;
-    document.querySelector('.duration').textContent = currentSuggestion.duration;
-    document.querySelector('.cost').textContent = `$${currentSuggestion.cost}`;
-    document.querySelector('.category').textContent = currentSuggestion.category;
-    document.querySelector('.location').textContent = currentSuggestion.location;
+    // Create new card content
+    const card = document.querySelector('.suggestion-card');
+    card.style.transition = 'none'; // Reset transition
+    card.style.transform = 'none'; // Reset transform
+    
+    // Update card content
+    card.querySelector('.activity-title').textContent = currentSuggestion.title;
+    card.querySelector('.activity-description').textContent = currentSuggestion.description;
+    card.querySelector('.duration').textContent = currentSuggestion.duration;
+    card.querySelector('.cost').textContent = `$${currentSuggestion.cost}`;
+    card.querySelector('.category').textContent = currentSuggestion.category;
+    card.querySelector('.location').textContent = currentSuggestion.location;
+    
+    // Force a reflow to ensure the card resets properly
+    void card.offsetHeight;
+    
+    // Make card visible with fade in
+    card.style.opacity = '1';
+    card.style.display = 'block';
     
     updateProgress();
 }
@@ -468,5 +508,121 @@ function showSelectionSummary() {
         });
     });
 }
+
+let touchStartX = 0;
+let touchStartY = 0;
+let currentCard = null;
+let initialRotation = 0;
+let initialTranslate = { x: 0, y: 0 };
+
+function handleTouchStart(e) {
+    if (e.touches) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    } else {
+        touchStartX = e.clientX;
+        touchStartY = e.clientY;
+    }
+    currentCard = e.currentTarget;
+    initialRotation = 0;
+    initialTranslate = { x: 0, y: 0 };
+    
+    // Add transition class for smooth movement
+    currentCard.style.transition = 'none';
+    currentCard.classList.add('suggestion-card-dragging');
+}
+
+function handleTouchMove(e) {
+    if (!currentCard) return;
+    
+    e.preventDefault();
+    
+    const currentX = e.touches ? e.touches[0].clientX : e.clientX;
+    const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    const deltaX = currentX - touchStartX;
+    const deltaY = currentY - touchStartY;
+    
+    // Calculate rotation based on horizontal movement
+    const rotation = deltaX * 0.1; // Adjust rotation sensitivity
+    
+    // Apply transform
+    currentCard.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${rotation}deg)`;
+    
+    // Update opacity of like/dislike indicators based on swipe direction
+    const likeIndicator = currentCard.querySelector('.like-indicator');
+    const dislikeIndicator = currentCard.querySelector('.dislike-indicator');
+    
+    if (deltaX > 50) {
+        likeIndicator.style.opacity = Math.min(deltaX / 100, 1);
+        dislikeIndicator.style.opacity = 0;
+    } else if (deltaX < -50) {
+        dislikeIndicator.style.opacity = Math.min(-deltaX / 100, 1);
+        likeIndicator.style.opacity = 0;
+    } else {
+        likeIndicator.style.opacity = 0;
+        dislikeIndicator.style.opacity = 0;
+    }
+}
+
+function handleTouchEnd(e) {
+    if (!currentCard) return;
+    
+    const deltaX = e.changedTouches ? 
+        e.changedTouches[0].clientX - touchStartX : 
+        e.clientX - touchStartX;
+    
+    currentCard.style.transition = 'transform 0.3s ease-out';
+    
+    // Threshold for swipe action
+    if (Math.abs(deltaX) > 100) {
+        const swipeOutDistance = deltaX > 0 ? window.innerWidth : -window.innerWidth;
+        currentCard.style.transform = `translate(${swipeOutDistance}px, 0) rotate(${deltaX > 0 ? 30 : -30}deg)`;
+        
+        // Hide current card
+        currentCard.style.opacity = '0';
+        
+        // Wait for swipe animation to complete before showing next card
+        setTimeout(() => {
+            if (deltaX > 0) {
+                // Like action
+                const slotSuggestions = suggestions.filter(s => s.slot_index === currentSlotIndex);
+                const currentSuggestion = slotSuggestions[currentOptionIndex];
+                selectedActivities.push(currentSuggestion);
+                processedSuggestions++;
+                
+                // Move to next time slot
+                currentSlotIndex++;
+                currentOptionIndex = 0;
+            } else {
+                // Skip/Dislike action
+                currentOptionIndex = (currentOptionIndex + 1) % 2;
+                if (currentOptionIndex === 0) {
+                    currentSlotIndex++;
+                }
+            }
+            
+            showSuggestion();
+        }, 300);
+    } else {
+        // Reset card position if swipe wasn't far enough
+        currentCard.style.transform = 'none';
+    }
+    
+    currentCard.classList.remove('suggestion-card-dragging');
+    currentCard = null;
+}
+
+// Add these event listeners to your suggestion cards
+document.querySelectorAll('.suggestion-card').forEach(card => {
+    card.addEventListener('mousedown', handleTouchStart);
+    card.addEventListener('mousemove', handleTouchMove);
+    card.addEventListener('mouseup', handleTouchEnd);
+    card.addEventListener('mouseleave', handleTouchEnd);
+    
+    card.addEventListener('touchstart', handleTouchStart);
+    card.addEventListener('touchmove', handleTouchMove);
+    card.addEventListener('touchend', handleTouchEnd);
+});
 </script>
 {% endblock %} 
