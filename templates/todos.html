@@ -36,11 +36,11 @@
         {% for day in trip_events %}
         <h2 class="day-header" id="day-{{ loop.index }}">
             Day {{ loop.index }} - {{ day.date }}
-            <button onclick="console.log('Map button clicked'); console.log('Activities:', {{ day.activities|tojson|safe }}); initDayMap({{ day.activities|tojson|safe }})" 
-                    class="map-btn" 
-                    title="View day's itinerary on map">
-                🗺️
-            </button>
+            <button 
+                onclick="handleMapClick({{ day.activities|tojson|safe }})"
+                class="map-btn" 
+                title="View day's itinerary on map"
+            >🗺️</button>
         </h2>
         {% for activity in day.activities %}
         <div class="activity-row">

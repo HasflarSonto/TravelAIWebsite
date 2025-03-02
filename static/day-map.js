@@ -1,3 +1,12 @@
+function handleMapClick(activities) {
+    console.log('Map clicked with activities:', activities);
+    if (activities && activities.length > 0) {
+        initDayMap(activities);
+    } else {
+        console.error('No activities provided');
+    }
+}
+
 function initDayMap(dayEvents) {
     console.log('=== initDayMap Debug Start ===');
     console.log('Received dayEvents:', dayEvents);

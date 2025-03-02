@@ -199,7 +199,7 @@ def generate_trip_plan(natural_input, parameters, use_test_data=False):
     try:
         response = client.messages.create(
             model="claude-3-opus-20240229",  # Updated to correct model name
-            max_tokens=4000,
+            max_tokens=6000,
             temperature=0.7,
             system="You are a travel planning assistant that creates detailed, realistic travel itineraries with accurate transportation times, costs, and activities.",
             messages=[{"role": "user", "content": prompt}]
@@ -219,37 +219,33 @@ def generate_trip_suggestions(parameters):
         print("⚡ Starting suggestion generation...")
         client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
         
-        # Calculate slots needed
+        # Calculate trip duration
         try:
             start_date = datetime.strptime(parameters['start_date'], "%Y-%m-%d")
             end_date = datetime.strptime(parameters['end_date'], "%Y-%m-%d")
-            trip_days = (end_date - start_date).days + 1
-            suggestions_count = trip_days * 2  # 2 activities per day
+            trip_duration = (end_date - start_date).days + 1
         except:
-            suggestions_count = 4  # Default to 2 days worth
+            trip_duration = 2  # Default to 2 days if date parsing fails
+            
+        print(f"📅 Trip duration: {trip_duration} days")
         
-        print(f"📅 Generating {suggestions_count} time slots with alternatives...")
+        # Calculate suggestions count (2 per day, max 4)
+        suggestions_count = min(4, trip_duration * 2)
         
+        # Build the prompt
         prompt = f"""
         Generate exactly {suggestions_count} activity suggestions for tourists visiting {parameters['end_location']}.
         Each activity should have ONE alternative option (total of {suggestions_count * 2} activities).
 
         Trip Details:
         - Location: {parameters['end_location']}
-        - Duration: {trip_days} days ({suggestions_count} activities needed)
+        - Duration: {trip_duration} days ({suggestions_count} activities needed)
         - Budget: ${parameters['budget']} total for {parameters['people_count']} people
         - Dates: {parameters['start_date']} to {parameters['end_date']}
         - Preferences: {parameters.get('natural_language_input', 'No specific preferences')}
 
         IMPORTANT: ALL suggestions MUST be real, existing places or activities in {parameters['end_location']}.
         Do NOT suggest generic activities or places from other locations.
-
-        For each time slot provide:
-        1. One main activity in {parameters['end_location']}
-        2. One alternative activity in {parameters['end_location']} that is:
-           - In the same category (e.g., both cultural, both outdoor)
-           - At a similar time of day
-           - Different from the main activity
 
         Return ONLY valid JSON matching this EXACT format:
         {{
@@ -259,18 +255,18 @@ def generate_trip_suggestions(parameters):
                     "best_time": "Morning/Afternoon/Evening",
                     "options": [
                         {{
-                            "title": "Activity in {parameters['end_location']}",
+                            "title": "Activity name",
                             "description": "Brief description",
                             "duration": "2-3 hours",
                             "cost": 45,
-                            "location": "Specific location name in {parameters['end_location']}"
+                            "location": "Specific location in {parameters['end_location']}"
                         }},
                         {{
-                            "title": "Alternative in {parameters['end_location']}",
+                            "title": "Alternative activity",
                             "description": "Brief description",
                             "duration": "2-3 hours",
                             "cost": 45,
-                            "location": "Different specific location in {parameters['end_location']}"
+                            "location": "Different location in {parameters['end_location']}"
                         }}
                     ]
                 }}
@@ -278,44 +274,55 @@ def generate_trip_suggestions(parameters):
         }}
         """
 
-        response = client.messages.create(
-            model="claude-3-opus-20240229",
-            max_tokens=2000,
-            temperature=0.7,
-            system=f"You are a local tour guide in {parameters['end_location']}. Only suggest real, specific places and activities in {parameters['end_location']}.",
-            messages=[{"role": "user", "content": prompt}]
-        )
-
-        data = extract_json_from_claude(response.content[0].text)
-        
-        if not data or "time_slots" not in data:
-            print("❌ Error: Invalid suggestions format")
-            return []
+        try:
+            print("🤖 Calling Claude API...")
+            response = client.messages.create(
+                model="claude-3-opus-20240229",
+                max_tokens=4000,
+                temperature=0.7,
+                system=f"You are a local tour guide in {parameters['end_location']}.",
+                messages=[{"role": "user", "content": prompt}]
+            )
             
-        # Format suggestions for frontend
-        formatted_suggestions = []
-        for i, slot in enumerate(data["time_slots"]):
-            for j, option in enumerate(slot["options"]):
-                suggestion = {
-                    "id": f"sug_{i}_{j}",
-                    "title": option["title"],
-                    "description": option["description"],
-                    "duration": option["duration"],
-                    "cost": option["cost"],
-                    "category": slot["category"],
-                    "location": option["location"],
-                    "best_time": slot["best_time"],
-                    "slot_index": i,
-                    "option_index": j
-                }
-                formatted_suggestions.append(suggestion)
-        
-        print(f"✅ Generated {len(formatted_suggestions)} total suggestions")
-        return formatted_suggestions
+            print("📝 Processing Claude response...")
+            data = extract_json_from_claude(response.content[0].text)
+            
+            if not data or "time_slots" not in data:
+                print("❌ Error: Invalid suggestions format")
+                return None, "Failed to generate valid suggestions"
+                
+            # Format suggestions for frontend
+            formatted_suggestions = []
+            for i, slot in enumerate(data["time_slots"]):
+                for j, option in enumerate(slot["options"]):
+                    suggestion = {
+                        "id": f"sug_{i}_{j}",
+                        "title": option["title"],
+                        "description": option["description"],
+                        "duration": option["duration"],
+                        "cost": option["cost"],
+                        "category": slot["category"],
+                        "location": option["location"],
+                        "best_time": slot["best_time"],
+                        "slot_index": i,
+                        "option_index": j
+                    }
+                    formatted_suggestions.append(suggestion)
+            
+            print(f"✅ Generated {len(formatted_suggestions)} total suggestions")
+            return formatted_suggestions, None
+            
+        except anthropic.RateLimitError as e:
+            print(f"⚠️ Rate limit exceeded: {str(e)}")
+            return None, "Service is temporarily busy. Please wait a minute and try again."
+            
+        except Exception as e:
+            print(f"❌ Error generating suggestions: {str(e)}")
+            return None, str(e)
 
     except Exception as e:
-        print(f"❌ Error generating suggestions: {str(e)}")
-        return []
+        print(f"❌ Error in generate_trip_suggestions: {str(e)}")
+        return None, str(e)
 
 
 def generate_final_itinerary(selected_activities, parameters):
@@ -414,9 +421,12 @@ def create_trip():
     
     # Generate suggestions
     try:
-        suggestions = generate_trip_suggestions(parameters)
-        if isinstance(suggestions, tuple):  # If it's an error response
-            return suggestions
+        suggestions, error = generate_trip_suggestions(parameters)
+        if error:
+            return jsonify({
+                "success": False,
+                "error": error
+            }), 429 if "temporarily busy" in error else 500
             
         # Store the suggestions directly (they're already in the right format)
         session['trip_suggestions'] = suggestions
@@ -522,6 +532,8 @@ def home():
 
 @app.route('/plan')
 def plan():
+    # Clear any existing session data when visiting the plan page
+    session.clear()
     return render_template('plan.html')
 
 
@@ -563,16 +575,61 @@ def suggestions():
     return render_template("suggestions.html")
 
 
+@app.route('/api/trip/generate', methods=['POST'])
+def generate_trip():
+    try:
+        print("Received trip generation request")
+        print("ANTHROPIC_API_KEY present:", bool(ANTHROPIC_API_KEY))
+        
+        # Clear any existing session data
+        session.clear()
+        
+        data = request.json
+        print("Received data:", data)
+        
+        # Validate required fields
+        required_fields = ['startLocation', 'endLocation', 'startDate', 'endDate', 'budget', 'peopleCount', 'naturalLanguageInput']
+        missing_fields = [field for field in required_fields if not data.get(field)]
+        
+        if missing_fields:
+            return jsonify({
+                'success': False, 
+                'error': f'Missing required fields: {", ".join(missing_fields)}'
+            }), 400
+
+        # Store trip parameters in session
+        session['trip_parameters'] = {
+            'start_location': data['startLocation'],
+            'end_location': data['endLocation'],
+            'start_date': data['startDate'],
+            'end_date': data['endDate'],
+            'budget': float(data['budget']),
+            'people_count': int(data['peopleCount']),
+            'natural_language_input': data['naturalLanguageInput']
+        }
+        
+        return jsonify({'success': True})
+            
+    except Exception as e:
+        print(f"Error in generate_trip: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
+
+
 @app.route('/api/suggestions', methods=['GET'])
 def get_suggestions():
     """Returns AI-generated activity suggestions for the trip."""
     try:
+        # First check if we already have suggestions
         if 'trip_suggestions' in session:
             return jsonify({
                 "success": True,
                 "suggestions": session['trip_suggestions']
             })
             
+        # If no parameters, return error
         if 'trip_parameters' not in session:
             print("❌ No trip parameters found in session")
             return jsonify({
@@ -580,10 +637,18 @@ def get_suggestions():
                 "error": "No trip parameters found"
             }), 404
 
+        # Generate suggestions only if we don't have them yet
         parameters = session['trip_parameters']
         print(f"📋 Retrieved parameters from session: {parameters}")
         
-        suggestions = generate_trip_suggestions(parameters)
+        suggestions, error = generate_trip_suggestions(parameters)
+        
+        if error:
+            return jsonify({
+                "success": False,
+                "error": error
+            }), 429 if "temporarily busy" in error else 500
+            
         session['trip_suggestions'] = suggestions
         
         return jsonify({
@@ -825,33 +890,6 @@ def save_todos():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
-@app.route('/api/trip/generate', methods=['POST'])
-def generate_trip():
-    try:
-        data = request.json
-        
-        # Validate required fields
-        required_fields = ['destination', 'start_date', 'end_date', 'budget']
-        for field in required_fields:
-            if field not in data:
-                return jsonify({'success': False, 'error': f'Missing {field}'}), 400
-        
-        # Store trip data in session
-        session['trip_data'] = {
-            'destination': data['destination'],
-            'start_date': data['start_date'],
-            'end_date': data['end_date'],
-            'budget': float(data['budget'])
-        }
-        
-        # Initialize empty trip events
-        session['trip_events'] = []
-        
-        return jsonify({'success': True})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
 @app.route('/api/ai/todo-help', methods=['POST'])
 def get_ai_todo_help():
     """Generates AI assistance for a specific todo/task."""
@@ -902,6 +940,14 @@ def get_ai_todo_help():
             "success": False,
             "error": "Failed to get AI assistance"
         }), 500
+
+
+@app.route('/api/trip/debug', methods=['GET'])
+def debug_trip_data():
+    return jsonify({
+        'trip_events': session.get('trip_events', []),
+        'sample_day': session.get('trip_events', [])[0] if session.get('trip_events', []) else None
+    })
 
 
 if __name__ == '__main__':

@@ -1,44 +1,50 @@
 document.addEventListener("DOMContentLoaded", function () {
     const tripForm = document.getElementById("trip-form");
     const generateButton = document.querySelector(".btn");
-    const loadingOverlay = document.querySelector(".loading-overlay");
+    const loadingAnimation = document.querySelector(".loading-animation");
 
     tripForm.addEventListener("submit", async function (event) {
         event.preventDefault();
         
-        // Show loading animation
         generateButton.disabled = true;
-        loadingOverlay.style.display = "flex";
-
-        const formData = {
-            startLocation: document.getElementById("startLocation").value,
-            endLocation: document.getElementById("endLocation").value,
-            naturalLanguageInput: document.getElementById("naturalLanguageInput").value,
-            budget: document.getElementById("budget").value,
-            peopleCount: document.getElementById("peopleCount").value,
-            startDate: document.getElementById("startDate").value,
-            endDate: document.getElementById("endDate").value
-        };
+        loadingAnimation.style.display = "flex";
 
         try {
+            // First save the trip parameters
             const response = await fetch('/api/trip/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({
+                    startLocation: document.getElementById("startLocation").value.trim(),
+                    endLocation: document.getElementById("endLocation").value.trim(),
+                    naturalLanguageInput: document.getElementById("naturalLanguageInput").value.trim(),
+                    budget: document.getElementById("budget").value,
+                    peopleCount: document.getElementById("peopleCount").value,
+                    startDate: document.getElementById("startDate").value,
+                    endDate: document.getElementById("endDate").value
+                })
             });
 
-            const data = await response.json();
-            if (data.success) {
-                window.location.href = '/suggestions';
-            } else {
-                throw new Error(data.error || 'Failed to generate itinerary');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
             }
+
+            // If successful, redirect to suggestions page
+            window.location.href = '/suggestions';
+            
         } catch (error) {
-            alert('Error: ' + error.message);
+            console.error('Error:', error);
+            if (error.message === 'Failed to fetch') {
+                alert('Unable to connect to the server. Please check your internet connection and try again.');
+            } else {
+                alert('Error: ' + error.message);
+            }
+        } finally {
             generateButton.disabled = false;
-            loadingOverlay.style.display = "none";
+            loadingAnimation.style.display = "none";
         }
     });
 });
