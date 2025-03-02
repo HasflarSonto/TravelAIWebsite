@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+
+{% block title %}Choose Activities - Trip Planner{% endblock %}
+
+{% block content %}
+<div id="loading-screen" class="loading-screen">
+    <div class="loading-content">
+        <h2>Creating Your Adventure</h2>
+        <div class="loading-animation">
+            <div class="waves">
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+            <div class="boat">⛵</div>
+        </div>
+        <p id="loading-status">Discovering amazing activities...</p>
+        <div class="loading-tips">
+            <p>Did you know?</p>
+            <div id="travel-tip" class="travel-tip"></div>
+        </div>
+    </div>
+</div>
+
+<div class="suggestions-container" style="display: none;">
+    <div class="progress-container">
+        <div class="progress-text">
+            <span id="selected-count">0</span> / <span id="required-count">0</span> activities selected
+        </div>
+        <div class="progress-bar">
+            <div id="progress" class="progress"></div>
+        </div>
+    </div>
+    
+    <div id="suggestion-card" class="suggestion-card">
+        <div class="card-content">
+            <h2 class="activity-title"></h2>
+            <p class="activity-description"></p>
+            <div class="activity-details">
+                <span class="duration"></span>
+                <span class="cost"></span>
+                <span class="category"></span>
+            </div>
+            <p class="location"></p>
+        </div>
+        <div class="swipe-actions">
+            <button class="skip-btn">✕</button>
+            <button class="like-btn">♥</button>
+        </div>
+    </div>
+
+    <div id="selection-summary" style="display: none;">
+        <h2>Selected Activities</h2>
+        <div id="selected-activities"></div>
+        <button id="generate-itinerary" class="btn">Generate Final Itinerary</button>
+    </div>
+</div>
+
+<style>
+.suggestions-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #161c1c;
+    color: #8796cf;
+}
+
+.progress-container {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.progress-text {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(135, 150, 207, 0.2);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: #69759d;
+    border-radius: 5px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.suggestion-card {
+    background: rgba(22, 28, 28, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.activity-title {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.activity-description {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.activity-details {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.activity-details span {
+    background: rgba(105, 117, 157, 0.2);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.swipe-actions {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.skip-btn, .like-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.skip-btn {
+    background: #ff4b4b;
+    color: white;
+}
+
+.like-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.skip-btn:hover, .like-btn:hover {
+    transform: scale(1.1);
+}
+
+#selected-activities {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.selected-activity {
+    background: rgba(105, 117, 157, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+#generate-itinerary {
+    background: #69759d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #161c1c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loading-content {
+    text-align: center;
+    color: #8796cf;
+    padding: 20px;
+    max-width: 600px;
+}
+
+.loading-animation {
+    position: relative;
+    height: 100px;
+    margin: 30px 0;
+    overflow: hidden;
+}
+
+.waves {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+}
+
+.wave {
+    position: absolute;
+    height: 20px;
+    width: 200%;
+    background: linear-gradient(90deg, transparent, rgba(135, 150, 207, 0.3), transparent);
+    animation: wave 3s linear infinite;
+}
+
+.wave:nth-child(2) {
+    top: 10px;
+    animation-delay: -0.5s;
+}
+
+.wave:nth-child(3) {
+    top: 20px;
+    animation-delay: -1s;
+}
+
+.boat {
+    position: absolute;
+    font-size: 40px;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    animation: boat 3s ease-in-out infinite;
+}
+
+@keyframes wave {
+    0% { transform: translateX(0) translateY(0); }
+    50% { transform: translateX(-25%) translateY(2px); }
+    100% { transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes boat {
+    0% { transform: translateX(-50%) rotate(0deg); }
+    25% { transform: translateX(-50%) translateY(-5px) rotate(3deg); }
+    75% { transform: translateX(-50%) translateY(5px) rotate(-3deg); }
+    100% { transform: translateX(-50%) rotate(0deg); }
+}
+
+.loading-tips {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(135, 150, 207, 0.1);
+    border-radius: 10px;
+}
+
+.travel-tip {
+    font-style: italic;
+    margin-top: 10px;
+}
+</style>
+
+<script>
+const travelTips = [
+    "Pack a reusable water bottle to stay hydrated and eco-friendly!",
+    "Take photos of important documents as a backup.",
+    "Learn a few basic phrases in the local language.",
+    "Check the weather forecast before packing.",
+    "Always carry a portable charger.",
+    "Save offline maps for your destination.",
+    "Try the local cuisine - it's part of the experience!",
+    "Walk when possible - it's the best way to explore.",
+    "Make copies of important documents.",
+    "Don't forget your travel adapter!"
+];
+
+let tipIndex = 0;
+const loadingStatus = document.getElementById('loading-status');
+const travelTip = document.getElementById('travel-tip');
+
+function updateTip() {
+    travelTip.textContent = travelTips[tipIndex];
+    tipIndex = (tipIndex + 1) % travelTips.length;
+}
+
+// Initial tip
+updateTip();
+
+// Rotate tips every 4 seconds
+setInterval(updateTip, 4000);
+
+// Fetch suggestions with progress updates
+async function fetchSuggestionsWithProgress() {
+    try {
+        const response = await fetch('/api/suggestions');
+        const data = await response.json();
+        
+        if (data.success) {
+            // Hide loading screen and show suggestions
+            document.getElementById('loading-screen').style.display = 'none';
+            document.querySelector('.suggestions-container').style.display = 'block';
+            
+            suggestions = data.suggestions;
+            totalSuggestions = suggestions.length;
+            updateProgress();
+            showSuggestion();
+        } else {
+            loadingStatus.textContent = "Error: " + data.error;
+        }
+    } catch (error) {
+        loadingStatus.textContent = "Error loading suggestions. Please try again.";
+        console.error('Error:', error);
+    }
+}
+
+// Start loading when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    fetchSuggestionsWithProgress();
+});
+
+let suggestions = [];
+let currentIndex = 0;
+let selectedActivities = [];
+let totalSuggestions = 0;
+let processedSuggestions = 0;
+
+// Track the current slot and option being viewed
+let currentSlotIndex = 0;
+let currentOptionIndex = 0;
+
+function showSuggestion() {
+    if (currentSlotIndex >= Math.floor(suggestions.length / 2)) {
+        showSelectionSummary();
+        return;
+    }
+    
+    // Get all suggestions for the current slot
+    const slotSuggestions = suggestions.filter(s => s.slot_index === currentSlotIndex);
+    const currentSuggestion = slotSuggestions[currentOptionIndex];
+    
+    document.querySelector('.activity-title').textContent = currentSuggestion.title;
+    document.querySelector('.activity-description').textContent = currentSuggestion.description;
+    document.querySelector('.duration').textContent = currentSuggestion.duration;
+    document.querySelector('.cost').textContent = `$${currentSuggestion.cost}`;
+    document.querySelector('.category').textContent = currentSuggestion.category;
+    document.querySelector('.location').textContent = currentSuggestion.location;
+    
+    updateProgress();
+}
+
+function updateProgress() {
+    const totalRequired = Math.floor(suggestions.length / 2);
+    document.getElementById('selected-count').textContent = selectedActivities.length;
+    document.getElementById('required-count').textContent = totalRequired;
+    const progress = (selectedActivities.length / totalRequired) * 100;
+    document.getElementById('progress').style.width = `${progress}%`;
+}
+
+function generateAlternativeSuggestion(rejectedSuggestion) {
+    return fetch('/api/suggestions/alternative', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            rejected: rejectedSuggestion,
+            time: rejectedSuggestion.best_time,
+            category: rejectedSuggestion.category
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            suggestions[currentIndex] = data.alternative;
+            showSuggestion();
+        }
+    });
+}
+
+// Event listeners
+document.querySelector('.skip-btn').addEventListener('click', () => {
+    // Move to next alternative for current slot
+    currentOptionIndex = (currentOptionIndex + 1) % 2;
+    
+    // If we've seen all alternatives, move to next slot
+    if (currentOptionIndex === 0) {
+        currentSlotIndex++;
+        showSuggestion();
+    } else {
+        showSuggestion();
+    }
+});
+
+document.querySelector('.like-btn').addEventListener('click', () => {
+    const slotSuggestions = suggestions.filter(s => s.slot_index === currentSlotIndex);
+    const currentSuggestion = slotSuggestions[currentOptionIndex];
+    selectedActivities.push(currentSuggestion);
+    processedSuggestions++;
+    
+    // Move to next time slot
+    currentSlotIndex++;
+    currentOptionIndex = 0;
+    showSuggestion();
+});
+
+function showSelectionSummary() {
+    document.getElementById('suggestion-card').style.display = 'none';
+    const summaryDiv = document.getElementById('selection-summary');
+    summaryDiv.style.display = 'block';
+    
+    // Display selected activities
+    const selectedList = document.getElementById('selected-activities');
+    selectedList.innerHTML = '';
+    selectedActivities.forEach(activity => {
+        const div = document.createElement('div');
+        div.className = 'selected-activity';
+        div.innerHTML = `
+            <h3>${activity.title}</h3>
+            <p>${activity.description}</p>
+            <div class="details">
+                <span>${activity.duration}</span>
+                <span>$${activity.cost}</span>
+                <span>${activity.best_time}</span>
+            </div>
+        `;
+        selectedList.appendChild(div);
+    });
+    
+    // Add event listener to the generate button
+    document.getElementById('generate-itinerary').addEventListener('click', function() {
+        this.disabled = true;
+        this.textContent = 'Generating...';
+        
+        // Show loading screen with boat animation
+        document.getElementById('loading-screen').style.display = 'flex';
+        document.getElementById('loading-status').textContent = 'Creating your perfect itinerary...';
+        
+        fetch('/api/suggestions/select', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                selected_activities: selectedActivities
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/itinerary';
+            } else {
+                document.getElementById('loading-screen').style.display = 'none';
+                alert('Error: ' + data.error);
+                this.disabled = false;
+                this.textContent = 'Generate Final Itinerary';
+            }
+        })
+        .catch(error => {
+            document.getElementById('loading-screen').style.display = 'none';
+            console.error('Error:', error);
+            alert('An error occurred while generating the itinerary');
+            this.disabled = false;
+            this.textContent = 'Generate Final Itinerary';
+        });
+    });
+}
+</script>
+{% endblock %} 
