@@ -48,8 +48,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     <p class="event-location">${event.location}</p>
                     <p class="event-location">cost: ${event.cost}$</p>
                     <div class="event-buttons">
-                        <button class="confirm-btn" data-id="${event.id}">Confirm</button>
-                        <button class="modify-btn" data-id="${event.id}">Modify</button>
+                        <button class="confirm-btn rbtn" data-id="${event.id}"></button>
+                        <button class="modify-btn lbtn" data-id="${event.id}"></button>
                     </div>
                 </div>
             `;
@@ -103,7 +103,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("Event modified!");
                 fetchItinerary();
             } else {
-                alert("Error modifying event: " + data.error);
             }
         })
         .catch(error => console.error("Error modifying event:", error));

@@ -4,12 +4,12 @@
 
 {% block content %}
     <div class="plan-container" style="background-color: #161c1c; box-shadow: none;">
-        <h1 style="background-color: #161c1c; box-shadow: none;">Plan Your Trip</h1>
-        <p style="background-color:rgba(22, 28, 28, 0.5); box-shadow: none;">Enter your trip details, and our AI will generate a personalized itinerary for you.</p>
+        <h1 style="background-color: #161c1c; box-shadow: none; text-align: center; color: rgba(251, 255, 240, 0.8);">Plan Your Trip</h1>
+        <p style="background-color:rgba(22, 28, 28, 0.5); box-shadow: none; text-align: center;">Enter your trip details, and our AI will generate a personalized itinerary for you.</p>
 
         <form id="trip-form" style="background-color: #161c1c; box-shadow: none; outline-color: rgba(22, 28, 28, 0.5);">
             
-            <label for="startLocation" style="background-color: #161c1c; box-shadow: none;">Starting Location:</label>
+            <label for="startLocation" style="background-color: #161c1c; box-shadow: none; color:#ab936f">Starting Location:</label>
             <input type="text" id="startLocation" name="startLocation" placeholder="e.g., Beijing, China" required 
                    style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
             <style>
@@ -18,7 +18,7 @@
                 }
             </style>
 
-            <label for="endLocation" style="background-color: #161c1c; box-shadow: none;">Destination:</label>
+            <label for="endLocation" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Destination:</label>
             <input type="text" id="endLocation" name="endLocation" placeholder="e.g., Rome, Italy" required 
                 style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
             <style>
@@ -27,7 +27,7 @@
                 }
             </style>
 
-            <label for="naturalLanguageInput" style="background-color: #161c1c; box-shadow: none;">Describe your trip:</label>
+            <label for="naturalLanguageInput" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Describe your trip:</label>
             <textarea id="naturalLanguageInput" name="naturalLanguageInput" placeholder="I want to visit Italy and explore historic sites..." required 
                 style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf"></textarea>
             <style>
@@ -36,7 +36,7 @@
                 }
             </style>
 
-            <label for="budget" style="background-color: #161c1c; box-shadow: none;">Budget ($):</label>
+            <label for="budget" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Budget ($):</label>
             <input type="number" id="budget" name="budget" required 
                 style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
             <style>
@@ -45,16 +45,16 @@
                 }
             </style>
 
-            <label for="peopleCount" style="background-color: #161c1c; box-shadow: none;">Number of Travelers:</label>
+            <label for="peopleCount" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Number of Travelers:</label>
             <input type="number" id="peopleCount" name="peopleCount" required 
-                style="background-color:rgba(22, 28, 28, 0.5); border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
+                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
             <style>
                 #peopleCount::placeholder {
                     color: #8796cf;
                 }
             </style>
 
-            <label for="startDate" style="background-color: #161c1c; box-shadow: none;">Start Date:</label>
+            <label for="startDate" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Start Date:</label>
             <input type="date" id="startDate" name="startDate" required 
                 style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
             <style>
@@ -63,9 +63,9 @@
                 }
             </style>
 
-            <label for="endDate" style="background-color: #161c1c; box-shadow: none;">End Date:</label>
+            <label for="endDate" style="background-color: #161c1c; box-shadow: none;color:#ab936f">End Date:</label>
             <input type="date" id="endDate" name="endDate" required 
-                   style="background-color:rgba(22, 28, 28, 0.5); border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
+                   style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
             <style>
                 #endDate::placeholder {
                     color: #8796cf;
@@ -90,7 +90,7 @@
             border-radius: 20px !important;
             box-shadow: none !important;
             color:#8796cf !important;
-            font-family: 'Romanica', sans-serif !important;
+            font-family: 'alok', sans-serif !important;
             font-size: 1em !important;
             
         }
