@@ -4,6 +4,18 @@
 <div class="page-layout">
     <div class="left-column">
         <h1 class="itinerary-title">Trip Planning Checklist</h1>
+        
+        <!-- Restaurant call button (hidden by default) -->
+        <div id="restaurant-call" style="display: none; margin-bottom: 20px; padding: 15px; background: rgba(22, 28, 28, 0.7); border-radius: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <p style="color: #8796cf; margin: 0;">Would you like to make a reservation?</p>
+                <button onclick="callRestaurant('6466856128')" style="background: rgba(135, 150, 207, 0.3); color: #ffffff; padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: all 0.3s ease;">
+                    📞 Call Restaurant
+                </button>
+            </div>
+        </div>
+
+        <!-- AI output box -->
         <div id="ai-output" style="min-height: 100px; padding: 20px; background: rgba(22, 28, 28, 0.7); border-radius: 15px; margin: 20px 0; color: #8796cf;">
             <p class="placeholder-text" style="color: rgba(135, 150, 207, 0.6); font-style: italic;">Select a task to get AI assistance...</p>
         </div>
@@ -11,12 +23,25 @@
             <div class="loading-spinner"></div>
             <p style="color: #8796cf;">Getting AI assistance...</p>
         </div>
+
+        <!-- Add the map container here -->
+        <div id="day-map-container" style="height: 200px; margin: 20px 0; background: rgba(22, 28, 28, 0.7); border-radius: 15px; overflow: hidden;">
+            <!-- Map will be rendered here -->
+        </div>
+
         <a href="{{ url_for('show_itinerary') }}" class="back-btn">← Back to Itinerary</a>
     </div>
     
     <div class="right-column">
         {% for day in trip_events %}
-        <h2 class="day-header">Day {{ loop.index }} - {{ day.date }}</h2>
+        <h2 class="day-header" id="day-{{ loop.index }}">
+            Day {{ loop.index }} - {{ day.date }}
+            <button onclick="console.log('Map button clicked'); console.log('Activities:', {{ day.activities|tojson|safe }}); initDayMap({{ day.activities|tojson|safe }})" 
+                    class="map-btn" 
+                    title="View day's itinerary on map">
+                🗺️
+            </button>
+        </h2>
         {% for activity in day.activities %}
         <div class="activity-row">
             <div class="time-block">{{ activity.start_time }} to {{ activity.end_time }}</div>
@@ -27,7 +52,9 @@
                         <span>Event Confirmed</span>
                         <input type="checkbox" class="event-checkbox" {% if activity.confirmed %}checked{% endif %}>
                     </div>
-                    <button class="ai-help-btn" onclick="getAIHelp('{{ activity.title }}')" title="Get AI assistance">⭐</button>
+                    <button class="ai-help-btn" 
+                            onclick="getAIHelp('{{ activity.title }}'); checkForRestaurant('{{ activity.title }}')" 
+                            title="Get AI assistance">⭐</button>
                 </div>
             </div>
             <div class="location">{{ activity.location }}</div>
@@ -296,8 +323,29 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Add this to your existing styles */
+.map-btn {
+    background: transparent;
+    border: 1px solid #8796cf;
+    color: #8796cf;
+    cursor: pointer;
+    font-size: 1em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-left: 15px;
+    transition: all 0.3s ease;
+    vertical-align: middle;
+}
+
+.map-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(135, 150, 207, 0.2);
+    box-shadow: 0 4px 15px rgba(135, 150, 207, 0.2);
+}
 </style>
 
+<script src="{{ url_for('static', filename='restaurant-call.js') }}"></script>
 <script src="{{ url_for('static', filename='todos.js') }}"></script>
 
 <script>
@@ -385,5 +433,15 @@ async function getAIHelp(taskText) {
         outputDiv.innerHTML = '<p style="color: #ff6b6b;">An error occurred while getting AI assistance</p>';
     }
 }
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
+<script src="{{ url_for('static', filename='day-map.js') }}"></script>
+<script>
+    // Add this to verify Google Maps is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Google Maps loaded:', !!window.google?.maps);
+        console.log('Map container exists:', !!document.getElementById('day-map-container'));
+    });
 </script>
 {% endblock %} 

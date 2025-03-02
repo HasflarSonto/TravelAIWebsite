@@ -756,27 +756,33 @@ function hideModal(modalId) {
 }
 
 function editActivity(activityId) {
-    showModal('editModal');
-    const modal = document.getElementById('editModal');
-    const activity = document.querySelector(`div[data-id="${activityId}"]`);
-    
-    if (!activity) {
-        console.error('Activity element not found for ID:', activityId);
+    if (!activityId) {
+        console.error('No activity ID provided');
         return;
     }
     
-    // Get the time elements and cost
-    const timeBlock = activity.querySelector('.time-block').textContent;
-    const [startTime, endTime] = timeBlock.split('to').map(t => t.trim());
+    const activity = document.querySelector(`div[data-id="${activityId}"]`);
+    if (!activity) {
+        console.error('Activity not found');
+        return;
+    }
+
+    // Get the activity details
+    const title = activity.querySelector('.activity-details h3').textContent;
+    const [startTime, endTime] = activity.querySelector('.activity-time').textContent.split(' to ').map(t => t.trim());
+    const location = activity.querySelector('.location').textContent;
     const cost = activity.querySelector('.cost').textContent.replace('$', '');
-    
-    // Populate form with current values
+
+    // Populate the edit modal
     document.getElementById('editActivityId').value = activityId;
-    document.getElementById('editTitle').value = activity.querySelector('h3').textContent;
+    document.getElementById('editTitle').value = title;
     document.getElementById('editStartTime').value = convertTo24Hour(startTime);
     document.getElementById('editEndTime').value = convertTo24Hour(endTime);
-    document.getElementById('editLocation').value = activity.querySelector('.location').textContent;
+    document.getElementById('editLocation').value = location;
     document.getElementById('editCost').value = cost;
+
+    // Show the modal
+    showModal('editModal');
 }
 
 function closeModal() {
@@ -784,9 +790,17 @@ function closeModal() {
 }
 
 function deleteActivity(activityId) {
+    if (!activityId) {
+        console.error('No activity ID provided');
+        return;
+    }
+
     if (confirm('Are you sure you want to delete this event?')) {
         fetch(`/api/trip/event/${activityId}/delete`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         })
         .then(response => response.json())
         .then(data => {
@@ -794,12 +808,12 @@ function deleteActivity(activityId) {
                 closeModal();
                 window.location.reload();
             } else {
-                alert('Failed to delete activity: ' + data.error);
+                throw new Error(data.error || 'Failed to delete activity');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while deleting the activity');
+            alert('Failed to delete activity: ' + error.message);
         });
     }
 }

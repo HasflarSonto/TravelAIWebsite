@@ -1,14 +1,14 @@
 document.addEventListener("DOMContentLoaded", function () {
     const tripForm = document.getElementById("trip-form");
     const generateButton = document.querySelector(".btn");
-    const loadingMessage = document.getElementById("loading-message");
+    const loadingOverlay = document.querySelector(".loading-overlay");
 
     tripForm.addEventListener("submit", async function (event) {
         event.preventDefault();
         
+        // Show loading animation
         generateButton.disabled = true;
-        generateButton.innerText = "Generating...";
-        loadingMessage.style.display = "block";
+        loadingOverlay.style.display = "flex";
 
         const formData = {
             startLocation: document.getElementById("startLocation").value,
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         try {
-            const response = await fetch('/api/trip', {
+            const response = await fetch('/api/trip/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -38,8 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
             alert('Error: ' + error.message);
             generateButton.disabled = false;
-            generateButton.innerText = "Generate Itinerary";
-            loadingMessage.style.display = "none";
+            loadingOverlay.style.display = "none";
         }
     });
 });
