@@ -10,25 +10,28 @@
         {% for day in trip_events %}
         <div class="day-container">
             <h2>Day {{ loop.index }} - {{ day.date }}</h2>
-            {% for activity in day.activities %}
-            <div class="activity-row" data-id="{{ activity.id }}">
-                <div class="activity-content">
-                    <div class="activity-time">
-                        <div class="time-block">
-                            {{ activity.start_time }} to {{ activity.end_time }}
+            <div class="activity-rows-container">
+                {% for activity in day.activities %}
+                <div class="activity-row" data-id="{{ activity.id }}">
+                    <div class="activity-content">
+                        <div class="activity-time">
+                            <div class="time-block">
+                                {{ activity.start_time }} to {{ activity.end_time }}
+                            </div>
+                        </div>
+                        <div class="activity-details">
+                            <h3>{{ activity.title }}</h3>
+                            <p class="location">{{ activity.location }}</p>
+                            <p class="cost">${{ activity.cost }}</p>
+                        </div>
+                        <div class="activity-actions">
+                            <button class="edit-btn" onclick="editActivity('{{ activity.id }}')">Edit</button>
                         </div>
                     </div>
-                    <div class="activity-details">
-                        <h3>{{ activity.title }}</h3>
-                        <p class="location">{{ activity.location }}</p>
-                        <p class="cost">${{ activity.cost }}</p>
-                    </div>
-                    <div class="activity-actions">
-                        <button class="edit-btn" onclick="editActivity('{{ activity.id }}')">Edit</button>
-                    </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            <button class="add-btn" onclick="showAddModal('{{ day.date }}')">+ Add Activity</button>
         </div>
         {% endfor %}
     </div>
@@ -37,7 +40,7 @@
 <!-- Edit Modal -->
 <div id="editModal" class="modal">
     <div class="modal-content">
-        <h2>Edit Activity</h2>
+        <h2>Edit Event</h2>
         <form id="editForm">
             <input type="hidden" id="editActivityId">
             <div class="form-group">
@@ -60,9 +63,46 @@
                 <label>Cost ($)</label>
                 <input type="number" id="editCost" step="0.01" required>
             </div>
-            <div class="button-group">
+            <div class="button-group primary-actions">
+                <button type="button" class="delete-btn" onclick="deleteActivity(document.getElementById('editActivityId').value)">Delete Event</button>
                 <button type="submit" class="save-btn">Save Changes</button>
+            </div>
+            <div class="button-group secondary-actions" style="margin-top: 10px; justify-content: center;">
                 <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add New Event Modal -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <h2>Add New Event</h2>
+        <form id="addForm">
+            <input type="hidden" id="addDayDate">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="addTitle" required>
+            </div>
+            <div class="form-group">
+                <label>Start Time</label>
+                <input type="time" id="addStartTime" required>
+            </div>
+            <div class="form-group">
+                <label>End Time</label>
+                <input type="time" id="addEndTime" required>
+            </div>
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="addLocation" required>
+            </div>
+            <div class="form-group">
+                <label>Cost ($)</label>
+                <input type="number" id="addCost" step="0.01" required>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="save-btn">Add Event</button>
+                <button type="button" class="cancel-btn" onclick="closeAddModal()">Cancel</button>
             </div>
         </form>
     </div>
@@ -148,6 +188,23 @@
     color: #161c1c;
 }
 
+.add-btn {
+    background: transparent;
+    border: 1px solid #6c8aff;
+    color: #6c8aff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 16px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.add-btn:hover {
+    background: #6c8aff;
+    color: #161c1c;
+}
+
 .modal {
     display: none;
     position: fixed;
@@ -166,6 +223,7 @@
     max-width: 500px;
     margin: 50px auto;
     color: #8796cf;
+    border: 1px solid rgba(135, 150, 207, 0.2);
 }
 
 .form-group {
@@ -188,26 +246,69 @@
 
 .button-group {
     display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+    position: relative;
 }
 
-.save-btn, .cancel-btn {
-    padding: 8px 20px;
-    border-radius: 4px;
-    cursor: pointer;
+/* Only apply separator to the first button group */
+.button-group:first-of-type::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: rgba(135, 150, 207, 0.2);
 }
 
 .save-btn {
+    background: transparent;
+    border: 1px solid #8796cf;
+    color: #8796cf;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.save-btn:hover {
     background: #8796cf;
     color: #161c1c;
-    border: none;
+}
+
+.delete-btn {
+    background: transparent;
+    border: 1px solid #ff4444;
+    color: #ff4444;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.delete-btn:hover {
+    background: #ff4444;
+    color: #161c1c;
 }
 
 .cancel-btn {
     background: transparent;
-    border: 1px solid #8796cf;
-    color: #8796cf;
+    border: 1px solid #6b7a9a;
+    color: #6b7a9a;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.cancel-btn:hover {
+    background: #6b7a9a;
+    color: #161c1c;
 }
 
 @media (max-width: 768px) {
@@ -224,7 +325,7 @@
 
 <script>
 function convertTimeToMinutes(timeStr) {
-    // Parse the time string
+    // Parse the time string (e.g., "8:00 AM" or "2:00 PM")
     const [time, period] = timeStr.split(' ');
     let [hours, minutes] = time.split(':').map(Number);
     
@@ -238,23 +339,60 @@ function convertTimeToMinutes(timeStr) {
     return hours * 60 + minutes;
 }
 
-// Sort activities by time before displaying
+function sortActivitiesInDay(dayContainer) {
+    const activityContainer = dayContainer.querySelector('.activity-rows-container');
+    const activities = Array.from(activityContainer.children);
+    
+    // Sort activities by start time
+    activities.sort((a, b) => {
+        const timeA = a.querySelector('.time-block').textContent.split(' to ')[0];
+        const timeB = b.querySelector('.time-block').textContent.split(' to ')[0];
+        return convertTimeToMinutes(timeA) - convertTimeToMinutes(timeB);
+    });
+
+    // Clear and re-append in sorted order
+    activities.forEach(activity => activityContainer.appendChild(activity));
+}
+
+document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const activityId = document.getElementById('editActivityId').value;
+    
+    const formData = {
+        title: document.getElementById('editTitle').value,
+        start_time: convertTo12Hour(document.getElementById('editStartTime').value),
+        end_time: convertTo12Hour(document.getElementById('editEndTime').value),
+        location: document.getElementById('editLocation').value,
+        cost: parseFloat(document.getElementById('editCost').value)
+    };
+    
+    try {
+        const response = await fetch(`/api/trip/event/${activityId}/modify`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            // Instead of updating the UI directly, reload the page
+            window.location.reload();
+        } else {
+            alert('Failed to update activity: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while updating the activity');
+    }
+});
+
+// Sort all days on page load
 document.addEventListener('DOMContentLoaded', function() {
     const dayContainers = document.querySelectorAll('.day-container');
-    
-    dayContainers.forEach(container => {
-        const activities = Array.from(container.querySelectorAll('.activity-row'));
-        
-        activities.sort((a, b) => {
-            const timeA = a.querySelector('.time-block').textContent.split(' to ')[0];
-            const timeB = b.querySelector('.time-block').textContent.split(' to ')[0];
-            return convertTimeToMinutes(timeA) - convertTimeToMinutes(timeB);
-        });
-        
-        activities.forEach(activity => {
-            container.appendChild(activity);
-        });
-    });
+    dayContainers.forEach(sortActivitiesInDay);
 });
 
 function convertTo12Hour(timeStr) {
@@ -317,21 +455,56 @@ function editActivity(activityId) {
     modal.style.display = 'block';
 }
 
-document.getElementById('editForm').addEventListener('submit', async (e) => {
+function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+function deleteActivity(activityId) {
+    if (confirm('Are you sure you want to delete this event?')) {
+        fetch(`/api/trip/event/${activityId}/delete`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeModal();
+                window.location.reload();
+            } else {
+                alert('Failed to delete activity: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the activity');
+        });
+    }
+}
+
+function showAddModal(dayDate) {
+    const modal = document.getElementById('addModal');
+    document.getElementById('addDayDate').value = dayDate;
+    document.getElementById('addForm').reset();
+    modal.style.display = 'block';
+}
+
+function closeAddModal() {
+    document.getElementById('addModal').style.display = 'none';
+}
+
+document.getElementById('addForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const activityId = document.getElementById('editActivityId').value;
-    
     const formData = {
-        title: document.getElementById('editTitle').value,
-        start_time: convertTo12Hour(document.getElementById('editStartTime').value),
-        end_time: convertTo12Hour(document.getElementById('editEndTime').value),
-        location: document.getElementById('editLocation').value,
-        cost: parseFloat(document.getElementById('editCost').value)
+        day_date: document.getElementById('addDayDate').value,
+        title: document.getElementById('addTitle').value,
+        start_time: convertTo12Hour(document.getElementById('addStartTime').value),
+        end_time: convertTo12Hour(document.getElementById('addEndTime').value),
+        location: document.getElementById('addLocation').value,
+        cost: parseFloat(document.getElementById('addCost').value)
     };
     
     try {
-        const response = await fetch(`/api/trip/event/${activityId}/modify`, {
+        const response = await fetch('/api/trip/event/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -341,32 +514,23 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
         
         const data = await response.json();
         if (data.success) {
-            // Update the UI with 12-hour format
-            const activity = document.querySelector(`div[data-id="${activityId}"]`);
-            activity.querySelector('h3').textContent = formData.title;
-            activity.querySelector('.location').textContent = formData.location;
-            activity.querySelector('.cost').textContent = `$${formData.cost}`;
-            activity.querySelector('.time-block').textContent = 
-                `${formData.start_time} to ${formData.end_time}`;
-            
-            closeModal();
+            window.location.reload();
         } else {
-            alert('Failed to update activity: ' + data.error);
+            alert('Failed to add activity: ' + data.error);
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('An error occurred while updating the activity');
+        alert('An error occurred while adding the activity');
     }
 });
 
-function closeModal() {
-    document.getElementById('editModal').style.display = 'none';
-}
-
-// Close modal when clicking outside
+// Close modals when clicking outside
 window.onclick = function(event) {
-    const modal = document.getElementById('editModal');
-    if (event.target == modal) {
+    const addModal = document.getElementById('addModal');
+    const editModal = document.getElementById('editModal');
+    if (event.target == addModal) {
+        closeAddModal();
+    } else if (event.target == editModal) {
         closeModal();
     }
 }

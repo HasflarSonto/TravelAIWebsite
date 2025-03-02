@@ -742,5 +742,47 @@ def modify_event(event_id):
     return jsonify({"success": False, "error": "Event not found"}), 404
 
 
+@app.route('/api/trip/event/<event_id>/delete', methods=['DELETE'])
+def delete_event(event_id):
+    if 'trip_events' not in session:
+        return jsonify({"success": False, "error": "No itinerary found"}), 404
+    
+    events = session['trip_events']
+    for day in events:
+        day['activities'] = [a for a in day['activities'] if str(a.get('id')) != str(event_id)]
+    
+    session.modified = True
+    return jsonify({"success": True})
+
+
+@app.route('/api/trip/event/add', methods=['POST'])
+def add_event():
+    if 'trip_events' not in session:
+        return jsonify({"success": False, "error": "No itinerary found"}), 404
+    
+    data = request.json
+    if not data:
+        return jsonify({"success": False, "error": "No data provided"}), 400
+    
+    new_event = {
+        'id': str(uuid.uuid4()),
+        'title': data['title'],
+        'start_time': data['start_time'],
+        'end_time': data['end_time'],
+        'location': data['location'],
+        'cost': data['cost']
+    }
+    
+    # Find the correct day and add the event
+    events = session['trip_events']
+    for day in events:
+        if day['date'] == data['day_date']:
+            day['activities'].append(new_event)
+            session.modified = True
+            return jsonify({"success": True, "newEvent": new_event})
+    
+    return jsonify({"success": False, "error": "Day not found"}), 404
+
+
 if __name__ == '__main__':
     app.run(debug=True)
