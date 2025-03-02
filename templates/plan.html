@@ -3,276 +3,102 @@
 {% block title %}Plan Your Trip - Trip Planner{% endblock %}
 
 {% block content %}
-<!-- Loading overlay -->
-<div id="loading-overlay" class="loading-overlay" style="display: none;">
-    <div class="loading-content">
-        <h2>Planning Your Adventure! 🌍</h2>
-        <div class="loading-animation">
-            <div class="plane">✈️</div>
-            <div class="path"></div>
-        </div>
-        <p id="loading-status">Crafting your personalized travel suggestions...</p>
-        <div class="progress-container">
-            <div id="progress-bar" class="progress-bar"></div>
-        </div>
-        <div id="loading-message" class="loading-message">
-            Exploring amazing activities in <span id="destination-name"></span>...
-        </div>
+    <div class="plan-container" style="background-color: #161c1c; box-shadow: none;">
+        <h1 style="background-color: #161c1c; box-shadow: none; text-align: center; color: rgba(251, 255, 240, 0.8);">Plan Your Trip</h1>
+        <p style="background-color:rgba(22, 28, 28, 0.5); box-shadow: none; text-align: center;">Enter your trip details, and our AI will generate a personalized itinerary for you.</p>
+
+        <form id="trip-form" style="background-color: #161c1c; box-shadow: none; outline-color: rgba(22, 28, 28, 0.5);">
+            
+            <label for="startLocation" style="background-color: #161c1c; box-shadow: none; color:#ab936f">Starting Location:</label>
+            <input type="text" id="startLocation" name="startLocation" placeholder="e.g., Beijing, China" required 
+                   style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
+            <style>
+                #startLocation::placeholder {
+                    color: #8796cf;
+                }
+            </style>
+
+            <label for="endLocation" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Destination:</label>
+            <input type="text" id="endLocation" name="endLocation" placeholder="e.g., Rome, Italy" required 
+                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
+            <style>
+                #endLocation::placeholder {
+                    color: #8796cf;
+                }
+            </style>
+
+            <label for="naturalLanguageInput" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Describe your trip:</label>
+            <textarea id="naturalLanguageInput" name="naturalLanguageInput" placeholder="I want to visit Italy and explore historic sites..." required 
+                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf"></textarea>
+            <style>
+                #naturalLanguageInput::placeholder {
+                    color: #8796cf;
+                }
+            </style>
+
+            <label for="budget" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Budget ($):</label>
+            <input type="number" id="budget" name="budget" required 
+                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
+            <style>
+                #budget::placeholder {
+                    color: #8796cf;
+                }
+            </style>
+
+            <label for="peopleCount" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Number of Travelers:</label>
+            <input type="number" id="peopleCount" name="peopleCount" required 
+                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
+            <style>
+                #peopleCount::placeholder {
+                    color: #8796cf;
+                }
+            </style>
+
+            <label for="startDate" style="background-color: #161c1c; box-shadow: none;color:#ab936f">Start Date:</label>
+            <input type="date" id="startDate" name="startDate" required 
+                style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
+            <style>
+                #startDate::placeholder {
+                    color: #8796cf;
+                }
+            </style>
+
+            <label for="endDate" style="background-color: #161c1c; box-shadow: none;color:#ab936f">End Date:</label>
+            <input type="date" id="endDate" name="endDate" required 
+                   style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
+            <style>
+                #endDate::placeholder {
+                    color: #8796cf;
+                }
+            </style>
+
+            <button type="submit" class="btn" style="background-color: #69759d; box-shadow: none;">Generate Itinerary</button>
+        </form>
+
+        <p id="loading-message" style="display: none; background-color: #161c1c; box-shadow: none;">Generating your itinerary... Please wait.</p>
     </div>
-</div>
 
-<div class="plan-container" style="background-color: #161c1c; box-shadow: none;">
-    <h1 style="background-color: #161c1c; box-shadow: none;">Plan Your Trip</h1>
-    <p style="background-color:rgba(22, 28, 28, 0.5); box-shadow: none;">Enter your trip details, and our AI will generate a personalized itinerary for you.</p>
-
-    <form id="tripForm" class="trip-form">
-        <label for="startLocation" style="background-color: #161c1c; box-shadow: none;">Starting Location:</label>
-        <input type="text" id="startLocation" name="startLocation" placeholder="e.g., Beijing, China" required 
-               style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
-        <style>
-            #startLocation::placeholder {
-                color: #8796cf;
-            }
-        </style>
-
-        <label for="endLocation" style="background-color: #161c1c; box-shadow: none;">Destination:</label>
-        <input type="text" id="endLocation" name="endLocation" placeholder="e.g., Rome, Italy" required 
-            style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
-        <style>
-            #endLocation::placeholder {
-                color: #8796cf;
-            }
-        </style>
-
-        <label for="naturalLanguageInput" style="background-color: #161c1c; box-shadow: none;">Describe your trip:</label>
-        <textarea id="naturalLanguageInput" name="naturalLanguageInput" placeholder="I want to visit Italy and explore historic sites..." required 
-            style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf"></textarea>
-        <style>
-            #naturalLanguageInput::placeholder {
-                color: #8796cf;
-            }
-        </style>
-
-        <label for="budget" style="background-color: #161c1c; box-shadow: none;">Budget ($):</label>
-        <input type="number" id="budget" name="budget" required 
-            style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
-        <style>
-            #budget::placeholder {
-                color: #8796cf;
-            }
-        </style>
-
-        <label for="peopleCount" style="background-color: #161c1c; box-shadow: none;">Number of Travelers:</label>
-        <input type="number" id="peopleCount" name="peopleCount" required 
-            style="background-color:rgba(22, 28, 28, 0.5); border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
-        <style>
-            #peopleCount::placeholder {
-                color: #8796cf;
-            }
-        </style>
-
-        <label for="startDate" style="background-color: #161c1c; box-shadow: none;">Start Date:</label>
-        <input type="date" id="startDate" name="startDate" required 
-            style="background-color: rgba(22, 28, 28, 0.5); border-radius: 20px; padding: 12px; box-shadow: none;outline-color: rgba(22, 28, 28, 0.5); color:#8796cf">
-        <style>
-            #startDate::placeholder {
-                color: #8796cf;
-            }
-        </style>
-
-        <label for="endDate" style="background-color: #161c1c; box-shadow: none;">End Date:</label>
-        <input type="date" id="endDate" name="endDate" required 
-               style="background-color:rgba(22, 28, 28, 0.5); border-radius: 20px; color: white; padding: 12px; box-shadow: none;">
-        <style>
-            #endDate::placeholder {
-                color: #8796cf;
-            }
-        </style>
-
-        <button type="submit" class="btn" style="background-color: #69759d; box-shadow: none;">Generate Itinerary</button>
-    </form>
-</div>
-
-<style>
-    body, main {
-        background-color: #161c1c;
-        box-shadow: none;
-    }
-    
-    input, textarea {
-        background-color: rgba(22, 28, 28, 0.5) !important;
-        border-color: rgba(22, 28, 28, 0.5) !important;
-        border-radius: 20px !important;
-        box-shadow: none !important;
-        color:#8796cf !important;
-        font-family: 'Romanica', sans-serif !important;
-        font-size: 1em !important;
-        
-    }
-    
-    ::placeholder {
-        color: #8796cf !important;
-    }
-
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(22, 28, 28, 0.95);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    .loading-content {
-        text-align: center;
-        color: #8796cf;
-        padding: 20px;
-        max-width: 600px;
-    }
-
-    .loading-animation {
-        margin: 30px 0;
-        position: relative;
-        height: 60px;
-    }
-
-    .plane {
-        font-size: 40px;
-        position: absolute;
-        left: 0;
-        animation: fly 3s infinite;
-    }
-
-    .path {
-        position: absolute;
-        top: 50%;
-        width: 100%;
-        height: 2px;
-        background: linear-gradient(90deg, #8796cf 50%, transparent 50%);
-        background-size: 20px 100%;
-        animation: movePath 1s linear infinite;
-    }
-
-    @keyframes fly {
-        0% { transform: translateX(0) translateY(0) rotate(0deg); }
-        25% { transform: translateX(100px) translateY(-10px) rotate(5deg); }
-        50% { transform: translateX(200px) translateY(0) rotate(0deg); }
-        75% { transform: translateX(100px) translateY(10px) rotate(-5deg); }
-        100% { transform: translateX(0) translateY(0) rotate(0deg); }
-    }
-
-    @keyframes movePath {
-        0% { background-position: 0 0; }
-        100% { background-position: -20px 0; }
-    }
-
-    .progress-container {
-        width: 100%;
-        height: 4px;
-        background: rgba(135, 150, 207, 0.2);
-        border-radius: 2px;
-        margin: 20px 0;
-    }
-
-    .progress-bar {
-        width: 0%;
-        height: 100%;
-        background: #8796cf;
-        border-radius: 2px;
-        transition: width 0.3s ease;
-    }
-
-    .loading-message {
-        margin-top: 20px;
-        font-style: italic;
-    }
-</style>
-
-<script>
-const loadingMessages = [
-    "Finding the best local spots...",
-    "Checking opening hours...",
-    "Calculating travel times...",
-    "Organizing activities by day...",
-    "Planning memorable experiences...",
-    "Optimizing your schedule...",
-    "Almost ready..."
-];
-
-let currentMessage = 0;
-let progressValue = 0;
-
-function updateLoadingMessage() {
-    const messageElement = document.getElementById('loading-message');
-    messageElement.textContent = loadingMessages[currentMessage];
-    currentMessage = (currentMessage + 1) % loadingMessages.length;
-}
-
-function updateProgress() {
-    progressValue = Math.min(progressValue + 15, 90); // Never reach 100% until complete
-    document.getElementById('progress-bar').style.width = `${progressValue}%`;
-}
-
-document.getElementById('tripForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    // Show loading overlay
-    const loadingOverlay = document.getElementById('loading-overlay');
-    loadingOverlay.style.display = 'flex';
-    
-    // Update destination name
-    const destination = document.getElementById('endLocation').value;
-    document.getElementById('destination-name').textContent = destination;
-    
-    // Start progress updates
-    progressValue = 0;
-    currentMessage = 0;
-    const messageInterval = setInterval(updateLoadingMessage, 2500);
-    const progressInterval = setInterval(updateProgress, 1000);
-    
-    try {
-        const formData = {
-            startLocation: document.getElementById('startLocation').value,
-            endLocation: document.getElementById('endLocation').value,
-            startDate: document.getElementById('startDate').value,
-            endDate: document.getElementById('endDate').value,
-            budget: document.getElementById('budget').value,
-            peopleCount: document.getElementById('peopleCount').value,
-            naturalLanguageInput: document.getElementById('naturalLanguageInput').value
-        };
-
-        const response = await fetch('/api/trip', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-            // Set progress to 100% before redirecting
-            document.getElementById('progress-bar').style.width = '100%';
-            setTimeout(() => {
-                window.location.href = '/suggestions';
-            }, 500);
-        } else {
-            alert('Error: ' + data.error);
-            loadingOverlay.style.display = 'none';
+    <style>
+        body, main {
+            background-color: #161c1c;
+            box-shadow: none;
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred. Please try again.');
-        loadingOverlay.style.display = 'none';
-    } finally {
-        clearInterval(messageInterval);
-        clearInterval(progressInterval);
-    }
-});
-</script>
+        
+        input, textarea {
+            background-color: rgba(22, 28, 28, 0.5) !important;
+            border-color: rgba(22, 28, 28, 0.5) !important;
+            border-radius: 20px !important;
+            box-shadow: none !important;
+            color:#8796cf !important;
+            font-family: 'alok', sans-serif !important;
+            font-size: 1em !important;
+            
+        }
+        
+        ::placeholder {
+            color: #8796cf !important;
+        }
+    </style>
+
+    <script src="{{ url_for('static', filename='plan.js') }}"></script>
 {% endblock %}
