@@ -87,14 +87,112 @@ textarea {
 
 .itinerary-container {
     text-align: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin: 0 auto;
 }
 
 .itinerary-event {
     background-color: #e9ecef;
     padding: 10px;
-    margin: 10px 0;
+    margin: 0;
     border-radius: 5px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.95em;
+}
+
+.itinerary-event h3 {
+    margin-top: 0;
+    font-size: 1.1em;
+}
+
+/* Event Cards for Swipable Interface */
+.event-card {
+    position: relative;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 15px;
+    margin-bottom: 15px;
+    touch-action: pan-y;
+    user-select: none;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    width: 100%;
+    max-width: 250px;
+    margin: 0 auto 15px;
+}
+
+#events-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin: 0 auto;
+}
+
+.event-header h3 {
+    margin-top: 0;
+    font-size: 1.1em;
+}
+
+.event-details {
+    font-size: 0.9em;
+}
+
+.event-details p {
+    margin: 5px 0;
+}
+
+.swipe-hint {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #999;
+    margin-top: 10px;
+}
+
+.left-hint {
+    color: #4CAF50;
+}
+
+.right-hint {
+    color: #FF9800;
+}
+
+#confirmed-events-container, #potential-events-container {
+    margin-top: 30px;
+}
+
+.confirmed-event, .potential-event {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    max-width: 250px;
+}
+
+.confirmed-event {
+    background-color: rgba(76, 175, 80, 0.1);
+    border-left: 4px solid #4CAF50;
+}
+
+.potential-event {
+    background-color: rgba(255, 152, 0, 0.1);
+    border-left: 4px solid #FF9800;
+}
+
+#confirmed-events-container, #potential-events-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin: 30px auto 0;
+}
+
+#confirmed-events-container h2, #potential-events-container h2 {
+    grid-column: 1 / -1;
+    text-align: center;
 }
 
 /* Error Page */

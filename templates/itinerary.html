@@ -8,14 +8,23 @@
         <h2 id="trip-date-range"></h2>
     </div>
 
-    <div class="itinerary-container">
-        <div id="itinerary-list">
-            <!-- Events will be dynamically inserted here -->
-        </div>
+    <div id="events-container">
+        <!-- Events will be loaded here for swiping -->
+    </div>
+
+    <div id="confirmed-events-container">
+        <h2>Confirmed Events</h2>
+        <!-- Confirmed events will be displayed here -->
+    </div>
+
+    <div id="potential-events-container">
+        <h2>Maybe Later</h2>
+        <!-- Potential events will be displayed here -->
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Load trip date range
             fetch("/api/trip/events")
                 .then(response => response.json())
                 .then(data => {
@@ -27,8 +36,276 @@
                             new Date(endDate).toLocaleDateString();
                     }
                 });
+            
+            // Load events for swipe interface
+            loadEvents();
+            
+            // Function to load events
+            function loadEvents() {
+                fetch('/api/trip/events')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            displayEvents(data.events);
+                        } else {
+                            console.error('Error loading events:', data.error);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+            
+            // Function to display events
+            function displayEvents(events) {
+                const eventsContainer = document.getElementById('events-container');
+                eventsContainer.innerHTML = '<h2>Swipe Events to Organize</h2>';
+                
+                events.forEach(event => {
+                    const eventElement = createEventElement(event);
+                    eventsContainer.appendChild(eventElement);
+                    
+                    // Initialize swipe functionality
+                    initSwipe(eventElement, event);
+                });
+            }
+            
+            // Function to create an event element
+            function createEventElement(event) {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'event-card';
+                eventElement.dataset.id = event.id || Math.random().toString(36).substr(2, 9);
+                
+                eventElement.innerHTML = `
+                    <div class="event-header">
+                        <h3>${event.title}</h3>
+                        <span class="event-date">${event.date}</span>
+                    </div>
+                    <div class="event-details">
+                        <p><strong>Location:</strong> ${event.location || 'TBD'}</p>
+                        <p><strong>Time:</strong> ${event.start_time || 'TBD'} - ${event.end_time || 'TBD'}</p>
+                        <p><strong>Cost:</strong> $${event.cost || '0'}</p>
+                    </div>
+                    <div class="swipe-hint">
+                        <span class="left-hint">← Swipe left to confirm</span>
+                        <span class="right-hint">Swipe right for maybe →</span>
+                    </div>
+                `;
+                
+                return eventElement;
+            }
+            
+            // Function to initialize swipe functionality
+            function initSwipe(element, eventData) {
+                let startX = 0;
+                let currentX = 0;
+                
+                element.addEventListener('touchstart', function(e) {
+                    startX = e.touches[0].clientX;
+                    this.style.transition = '';
+                });
+                
+                element.addEventListener('touchmove', function(e) {
+                    currentX = e.touches[0].clientX;
+                    const diffX = currentX - startX;
+                    
+                    // Limit the swipe distance
+                    if (Math.abs(diffX) < 200) {
+                        this.style.transform = `translateX(${diffX}px)`;
+                        
+                        // Change background color based on swipe direction
+                        if (diffX < 0) {
+                            this.style.backgroundColor = 'rgba(76, 175, 80, 0.2)'; // Green for confirm
+                        } else if (diffX > 0) {
+                            this.style.backgroundColor = 'rgba(255, 152, 0, 0.2)'; // Orange for maybe
+                        }
+                    }
+                });
+                
+                element.addEventListener('touchend', function() {
+                    this.style.transition = 'transform 0.3s ease, background-color 0.3s ease';
+                    const diffX = currentX - startX;
+                    
+                    if (diffX < -100) {
+                        // Swiped left - confirm event
+                        this.style.transform = 'translateX(-100%)';
+                        this.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                        setTimeout(() => {
+                            confirmEvent(eventData);
+                            this.remove();
+                        }, 300);
+                    } else if (diffX > 100) {
+                        // Swiped right - add to potential
+                        this.style.transform = 'translateX(100%)';
+                        this.style.backgroundColor = 'rgba(255, 152, 0, 0.2)';
+                        setTimeout(() => {
+                            addToPotential(eventData);
+                            this.remove();
+                        }, 300);
+                    } else {
+                        // Reset if not swiped enough
+                        this.style.transform = '';
+                        this.style.backgroundColor = '';
+                    }
+                });
+                
+                // Add mouse/desktop support for testing
+                element.addEventListener('mousedown', function(e) {
+                    startX = e.clientX;
+                    this.style.transition = '';
+                    
+                    const moveHandler = function(e) {
+                        currentX = e.clientX;
+                        const diffX = currentX - startX;
+                        
+                        if (Math.abs(diffX) < 200) {
+                            element.style.transform = `translateX(${diffX}px)`;
+                            
+                            if (diffX < 0) {
+                                element.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                            } else if (diffX > 0) {
+                                element.style.backgroundColor = 'rgba(255, 152, 0, 0.2)';
+                            }
+                        }
+                    };
+                    
+                    const upHandler = function() {
+                        document.removeEventListener('mousemove', moveHandler);
+                        document.removeEventListener('mouseup', upHandler);
+                        
+                        element.style.transition = 'transform 0.3s ease, background-color 0.3s ease';
+                        const diffX = currentX - startX;
+                        
+                        if (diffX < -100) {
+                            element.style.transform = 'translateX(-100%)';
+                            element.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                            setTimeout(() => {
+                                confirmEvent(eventData);
+                                element.remove();
+                            }, 300);
+                        } else if (diffX > 100) {
+                            element.style.transform = 'translateX(100%)';
+                            element.style.backgroundColor = 'rgba(255, 152, 0, 0.2)';
+                            setTimeout(() => {
+                                addToPotential(eventData);
+                                element.remove();
+                            }, 300);
+                        } else {
+                            element.style.transform = '';
+                            element.style.backgroundColor = '';
+                        }
+                    };
+                    
+                    document.addEventListener('mousemove', moveHandler);
+                    document.addEventListener('mouseup', upHandler);
+                });
+            }
+            
+            // Function to confirm an event
+            function confirmEvent(event) {
+                fetch(`/api/trip/event/${event.id || 'new'}/confirm`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(event)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Event confirmed:', event.title);
+                        updateEventLists();
+                    }
+                })
+                .catch(error => console.error('Error confirming event:', error));
+            }
+            
+            // Function to add event to potential list
+            function addToPotential(event) {
+                fetch(`/api/trip/event/${event.id || 'new'}/potential`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(event)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Event added to potential:', event.title);
+                        updateEventLists();
+                    }
+                })
+                .catch(error => console.error('Error adding to potential:', error));
+            }
+            
+            // Function to update the confirmed and potential event lists
+            function updateEventLists() {
+                fetch('/api/trip/confirmed-events')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            updateConfirmedEventsDisplay(data.events);
+                        }
+                    });
+                    
+                fetch('/api/trip/potential-events')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            updatePotentialEventsDisplay(data.events);
+                        }
+                    });
+            }
+            
+            // Function to update confirmed events display
+            function updateConfirmedEventsDisplay(events) {
+                const container = document.getElementById('confirmed-events-container');
+                if (!container) return;
+                
+                container.innerHTML = '<h2>Confirmed Events</h2>';
+                
+                if (events.length === 0) {
+                    container.innerHTML += '<p>No confirmed events yet.</p>';
+                    return;
+                }
+                
+                events.forEach(event => {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'confirmed-event';
+                    eventElement.innerHTML = `
+                        <h3>${event.title}</h3>
+                        <p>${event.date} | ${event.start_time || 'TBD'} - ${event.end_time || 'TBD'}</p>
+                        <p>${event.location || 'TBD'} | $${event.cost || '0'}</p>
+                    `;
+                    container.appendChild(eventElement);
+                });
+            }
+            
+            // Function to update potential events display
+            function updatePotentialEventsDisplay(events) {
+                const container = document.getElementById('potential-events-container');
+                if (!container) return;
+                
+                container.innerHTML = '<h2>Maybe Later</h2>';
+                
+                if (events.length === 0) {
+                    container.innerHTML += '<p>No potential events yet.</p>';
+                    return;
+                }
+                
+                events.forEach(event => {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'potential-event';
+                    eventElement.innerHTML = `
+                        <h3>${event.title}</h3>
+                        <p>${event.date} | ${event.start_time || 'TBD'} - ${event.end_time || 'TBD'}</p>
+                        <p>${event.location || 'TBD'} | $${event.cost || '0'}</p>
+                    `;
+                    container.appendChild(eventElement);
+                });
+            }
+            
+            // Initialize by loading confirmed and potential events
+            updateEventLists();
         });
     </script>
-
-    <script src="{{ url_for('static', filename='itinerary.js') }}"></script>
 {% endblock %}
