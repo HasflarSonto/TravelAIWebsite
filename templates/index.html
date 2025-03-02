@@ -8,7 +8,7 @@
         <p>Plan your next adventure with AI-generated itineraries tailored to your preferences.</p>
         
         <div class="logo-container">
-            <img src="{{ url_for('static', filename='images/logo.gif') }}" alt="Trip Planner Logo" id="logo-gif" style="display: none; max-width: 100%; max-height: 100%;">
+            <img src="{{ url_for('static', filename='yellow logo.gif') }}" alt="Trip Planner Logo" id="logo-gif" style="display: none; max-width: 100%; max-height: 100%;">
         </div>
         
         <a href="{{ url_for('plan') }}" class="btn" id="plan-btn">
@@ -60,7 +60,8 @@
         }
         
         .logo-container {
-            height: 150px;
+            height: 300pt;
+            width: 300pt;
             margin: 0 auto 2rem auto;
             display: flex;
             justify-content: center;
@@ -69,7 +70,7 @@
             top: 0;
             background-color: transparent;
         }
-        
+                
         .btn {
             background-color: #69759d;
             color: #fbfff0;
@@ -124,40 +125,57 @@
             width: 100%;
             height: 100%;
             background-color: transparent;
-            z-index: 1000;
+            z-index: 999;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 1s ease-in-out;
+            transition: opacity 0.3s ease-in-out, background-color 0.3s ease-out;  /* Faster transition */
         }
         
         .page-fade {
             opacity: 1;
-            background-color: #69759d;
         }
         
         /* Logo animation */
         .logo-animation {
-            animation: zoomIn 1s ease-in-out;
+            animation: zoomInBounce 2s ease-in-out;
             display: block !important;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1001;
-            max-width: 300px;
-            max-height: 300px;
+            width: 300pt;  /* Match container size */
+            height: 300pt;  /* Match container size */
+            object-fit: contain;
             background-color: transparent;
         }
         
-        @keyframes zoomIn {
+        @keyframes zoomInBounce {
             0% { 
                 opacity: 0; 
-                transform: translate(-50%, -50%) scale(0.8); 
-                background-color: transparent;
+                transform: translate(-50%, -50%) scale(0.3); 
+background-color: transparent;
+            }
+            40% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.5);
+background-color: transparent;
+            }
+            60% {
+                transform: translate(-50%, -50%) scale(0.7);
+background-color: transparent;
+            }
+            80% {
+                transform: translate(-50%, -50%) scale(1.2);
+background-color: transparent;
+            }
+            90% {
+                transform: translate(-50%, -50%) scale(0.9);
+            background-color: transparent;
             }
             100% { 
-                opacity: 1; 
-                transform: translate(-50%, -50%) scale(1.5); 
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);  /* End slightly larger */
                 background-color: transparent;
             }
         }
@@ -168,23 +186,42 @@
             const planBtn = document.getElementById('plan-btn');
             const pageTransition = document.querySelector('.page-transition');
             const logoGif = document.getElementById('logo-gif');
+
+            // Preload the plan page immediately
+            const preloadLink = document.createElement('link');
+            preloadLink.rel = 'preload';
+            preloadLink.as = 'document';
+            preloadLink.href = '{{ url_for("plan") }}';
+            document.head.appendChild(preloadLink);
+            
+            // Also preload any necessary assets
+            const preloadImage = new Image();
+            preloadImage.src = '{{ url_for("static", filename="yellow logo.gif") }}';
             
             planBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const targetUrl = this.getAttribute('href');
                 
+                // Start loading the next page in the background
+                fetch(targetUrl).catch(() => {});
+                
+                // Start with purple background
+                pageTransition.style.backgroundColor = '#69759d';
+                pageTransition.classList.add('page-fade');
+                
                 // Show and animate the logo
                 logoGif.classList.add('logo-animation');
                 
-                // Trigger the page transition
-                setTimeout(function() {
-                    pageTransition.classList.add('page-fade');
-                }, 150);
-                
-                // Navigate to the plan page after animations complete
+                // Start navigating even earlier
                 setTimeout(function() {
                     window.location.href = targetUrl;
-                }, 1000); // Changed to 1 second transition
+                }, 1500);  // Reduced from 1700ms to 1500ms
+                
+                // Fade to transparent
+                setTimeout(function() {
+                    pageTransition.style.transition = 'background-color 0.2s ease-out';
+                    pageTransition.style.backgroundColor = 'transparent';
+                }, 1300);  // Adjusted timing for smoother transition
             });
         });
     </script>

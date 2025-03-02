@@ -5,18 +5,27 @@ body {
     padding: 0;
     background-color: #f4f4f4;
     color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Navigation Bar */
 nav {
-    background-color: #007bff;
+    background-color: transparent;
     padding: 15px;
     text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 nav ul {
     list-style-type: none;
     padding: 0;
+    display: flex;
+    justify-content: center;
 }
 
 nav ul li {
@@ -35,37 +44,74 @@ main {
     padding: 20px;
     max-width: 800px;
     margin: auto;
-    background-color: white;
+    background-color: transparent;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Buttons */
-.btn {
+.rbtn {
     display: inline-block;
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
+    position: relative;
+    right: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: transparent;
+    color: #8796cf;
+    padding: 15px;
     text-decoration: none;
-    border-radius: 5px;
-    margin-top: 10px;
     cursor: pointer;
     border: none;
+    z-index: 100;
+    text-align: center;
 }
 
-.btn:hover {
-    background-color: #0056b3;
+.rbtn::after {
+    content: "→";
+    font-size: 24px;
+    color: #8796cf;
 }
+
+.lbtn {
+    display: inline-block;
+    position: relative;
+    left: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: transparent;
+    color: #8796cf;
+    padding: 15px;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    z-index: 100;
+    text-align: center;
+}
+
+.lbtn::after {
+    content: "←";
+    font-size: 24px;
+    color: #8796cf;
+}
+
+
 
 /* Forms */
 form {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
 label {
     margin-top: 10px;
     font-weight: bold;
+    text-align: center;
 }
 
 input, textarea {
@@ -74,135 +120,108 @@ input, textarea {
     border: 1px solid #ccc;
     border-radius: 5px;
     width: 100%;
+    background-color: transparent;
+    text-align: center;
 }
 
 textarea {
     height: 100px;
+    background-color: transparent;
+    text-align: center;
 }
 
 /* Itinerary List */
 #itinerary-list {
-    margin-top: 20px;
+    margin: 20px auto 0;
+    color: #fbfff0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: center;
+    width: 200%;
+    position: relative;
+    left: -50%;
 }
 
 .itinerary-container {
     text-align: center;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
+    background-color: transparent;
+    color: #fbfff0;
+    border-radius: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
     margin: 0 auto;
 }
 
 .itinerary-event {
-    background-color: #e9ecef;
+    background-color: rgba(135, 150, 207, 0.5);
     padding: 10px;
-    margin: 0;
-    border-radius: 5px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    height: 200px;
+    margin: 15px auto;
+    border-radius: 200px;
+    color: #fbfff0;
+    width: 80%;
+    height: auto;
+    min-height: 60px;
+    text-align: center;
     display: flex;
     flex-direction: column;
-    font-size: 0.95em;
-}
-
-.itinerary-event h3 {
-    margin-top: 0;
-    font-size: 1.1em;
-}
-
-/* Event Cards for Swipable Interface */
-.event-card {
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
     position: relative;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    padding: 15px;
-    margin-bottom: 15px;
-    touch-action: pan-y;
-    user-select: none;
-    transition: transform 0.3s ease, background-color 0.3s ease;
-    width: 100%;
-    max-width: 250px;
-    margin: 0 auto 15px;
 }
 
-#events-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
+.itinerary-date {
+    color: #fbfff0;
+    text-align: center;
+    width: 100%;
+    position: relative;
     margin: 0 auto;
 }
 
-.event-header h3 {
-    margin-top: 0;
-    font-size: 1.1em;
-}
-
-.event-details {
-    font-size: 0.9em;
-}
-
-.event-details p {
-    margin: 5px 0;
-}
-
-.swipe-hint {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: #999;
-    margin-top: 10px;
-}
-
-.left-hint {
-    color: #4CAF50;
-}
-
-.right-hint {
-    color: #FF9800;
-}
-
-#confirmed-events-container, #potential-events-container {
-    margin-top: 30px;
-}
-
-.confirmed-event, .potential-event {
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    max-width: 250px;
-}
-
-.confirmed-event {
-    background-color: rgba(76, 175, 80, 0.1);
-    border-left: 4px solid #4CAF50;
-}
-
-.potential-event {
-    background-color: rgba(255, 152, 0, 0.1);
-    border-left: 4px solid #FF9800;
-}
-
-#confirmed-events-container, #potential-events-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
-    margin: 30px auto 0;
-}
-
-#confirmed-events-container h2, #potential-events-container h2 {
-    grid-column: 1 / -1;
+.event-title, .event-time, .event-location {
+    color: #fbfff0;
     text-align: center;
+    margin: 3px 0;
+    width: 100%;
+    display: block;
+}
+
+.event-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 3px 0;
+}
+
+.event-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 5px;
 }
 
 /* Error Page */
 .error-container {
     text-align: center;
     padding: 50px;
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
 .error-container h1 {
     color: red;
+    text-align: center;
 }
 
 /* Responsive Design */
@@ -210,4 +229,72 @@ textarea {
     main {
         width: 90%;
     }
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+}
+
+.main-body {
+    background-color: #161c1c;
+    color: #8796cf;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main-body[data-page="home"] {
+    background-color: #fbfff0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main-nav {
+    background-color: transparent;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.nav-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 5%;
+    background-color: transparent;
+    width: 100%;
+}
+
+.nav-item {
+    margin: 0 20px;
+    text-align: center;
+}
+
+.nav-link {
+    color: #5b6a95;
+    transition: color 0.3s ease;
+    text-align: center;
+}
+
+.nav-link:hover {
+    color: #161c1c;
+}
+
+.nav-link.active {
+    font-weight: bold;
+}
+
+.logo {
+    height: 50px;
+    max-width: 100%;
+    display: block;
+    margin: 0 auto;
 }
